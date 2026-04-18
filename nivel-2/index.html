@@ -65,6 +65,13 @@
       <path d="M5 10.5V20h14v-9.5"/>
     </svg>
   </a>
+  <button class="ui-btn ui-btn--info" id="btn-info" aria-label="Instrucciones" title="¿Cómo se juega?" type="button">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+  </button>
   <button class="ui-btn ui-btn--fs" id="btn-fullscreen" aria-label="Pantalla completa" title="Pantalla completa" type="button">
     <svg class="ico-fs-on"  viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/>
@@ -73,6 +80,28 @@
       <path d="M9 4v5H4"/><path d="M15 4v5h5"/><path d="M9 20v-5H4"/><path d="M15 20v-5h5"/>
     </svg>
   </button>
+
+  <!-- Modal de instrucciones -->
+  <div class="info-modal" id="info-modal" aria-hidden="true" role="dialog" aria-labelledby="modal2-titulo">
+    <div class="info-modal__panel">
+      <button class="info-modal__close" id="btn-info-close" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="info-modal__nivel">Nivel II · Espíritus Hermanos</div>
+      <h2 class="info-modal__titulo" id="modal2-titulo">Los Colores de las Plantas</h2>
+      <p class="info-modal__texto">
+        Cuatro pigmentos naturales esperan sobre la roca: cúrcuma, achiote, hojas de chilca y jagua.
+        Cada color es una voz; cada trazo dibuja el sonido en tiempo real. La roca guarda la memoria
+        de todo lo que pintas — y luego lo desvanece, lentamente.
+      </p>
+      <ul class="info-modal__pasos">
+        <li>Elige un pigmento tocando una de las tazas.</li>
+        <li>Arrastra sobre la roca para pintar y escuchar.</li>
+        <li>La altura del gesto controla el tono: arriba = agudo, abajo = grave.</li>
+        <li>Cambia de pigmento en cualquier momento para sumar nuevas voces.</li>
+      </ul>
+    </div>
+  </div>
 
   <!-- Scripts -->
   <script src="js/audio.js?v=8"></script>

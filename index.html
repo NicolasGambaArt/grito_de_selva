@@ -2,126 +2,190 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Grito de Selva</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:         #0c0803;
-      --gold:       #c8941e;
-      --gold-lt:    #e8c97a;
-      --cream:      #f2e4c4;
-      --muted:      rgba(242,228,196,0.42);
-      --dim:        rgba(242,228,196,0.22);
-      --border:     rgba(200,148,30,0.22);
-      --border-h:   rgba(200,148,30,0.65);
+      /* ── Paleta derivada de TBS_p01-p02 (bosque oscuro + niebla + crema) ── */
+      --bg:          #0b0e08;
+      --forest-dk:   #16201000;   /* solo para gradients */
+      --forest:      #2a3c25;
+      --sage:        #4e6a4a;
+      --mist:        #7eaaa0;
+      --cream:       #cfc8a8;
+      --cream-dim:   rgba(207,200,168,0.42);
+      --cream-pale:  rgba(207,200,168,0.2);
+      --gold:        #b89050;
+      --gold-lt:     #d4aa6e;
+      --border:      rgba(184,144,80,0.22);
+      --border-h:    rgba(184,144,80,0.72);
+      --shadow:      rgba(0,0,0,0.75);
+
+      --serif: 'Cormorant Garamond', 'Palatino Linotype', Georgia, serif;
+      --display: 'Cinzel', 'Palatino Linotype', serif;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html, body { height: 100%; }
+    html { height: 100%; scroll-behavior: smooth; }
 
     body {
-      min-height: 100vh;
+      min-height: 100%;
       background-color: var(--bg);
       color: var(--cream);
+      font-family: var(--serif);
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: clamp(2.5rem, 8vw, 5rem) clamp(1.5rem, 6vw, 3rem);
       overflow-x: hidden;
+      position: relative;
     }
 
-    /* ── Texturas de fondo ── */
-    body::before {
-      content: '';
+    /* ── Fondo fotográfico ──────────────────────────────── */
+    .fondo-foto {
       position: fixed;
       inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
-      background-size: 250px 250px;
-      pointer-events: none;
       z-index: 0;
+      background-image: url("TBS_p01-p02.webp");
+      background-size: cover;
+      background-position: center 30%;
+      background-repeat: no-repeat;
+      /* La imagen es muy oscura de por sí — velo sutil encima */
+      filter: saturate(0.85) brightness(0.8);
     }
 
-    body::after {
-      content: '';
+    .fondo-velo {
       position: fixed;
       inset: 0;
-      background: radial-gradient(ellipse 80% 65% at 50% 44%, rgba(150,90,15,0.13) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
+      z-index: 1;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 42%,
+          rgba(30,45,22,0.15) 0%,
+          rgba(10,14,8,0.55) 75%,
+          rgba(8,12,6,0.82) 100%);
     }
 
-    header, nav, .nivel-card { position: relative; z-index: 1; }
+    .fondo-ruido {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      pointer-events: none;
+    }
 
-    /* ── Header ── */
+    /* ── Todo el contenido va sobre z-index: 3 ── */
+    .contenido {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: clamp(3rem, 9vw, 6rem) clamp(1.5rem, 6vw, 3.5rem) clamp(4rem, 8vw, 6rem);
+    }
+
+    /* ── Header ─────────────────────────────────────────── */
     header {
       text-align: center;
-      margin-bottom: clamp(3rem, 7vw, 5.5rem);
-      animation: appear 1.2s cubic-bezier(.22,1,.36,1) both;
+      margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+      animation: surgir 1.4s cubic-bezier(.22,1,.36,1) both;
     }
 
     h1 {
-      font-family: 'Cinzel', 'Palatino Linotype', serif;
+      font-family: var(--display);
       font-weight: 600;
-      font-size: clamp(2.4rem, 9vw, 6rem);
-      letter-spacing: 0.2em;
+      font-size: clamp(2.8rem, 11vw, 7rem);
+      letter-spacing: 0.22em;
       text-transform: uppercase;
       color: var(--gold-lt);
       line-height: 1;
       text-shadow:
-        0 0 80px rgba(232,201,122,0.22),
-        0 2px 0 rgba(0,0,0,0.6);
+        0 0 100px rgba(212,170,110,0.25),
+        0 2px 0 rgba(0,0,0,0.7);
     }
 
     .sub-prototipo {
-      margin-top: clamp(1rem, 2.8vw, 1.7rem);
-      font-family: 'Cormorant Garamond', 'Palatino Linotype', serif;
-      font-weight: 300;
-      font-size: clamp(0.7rem, 2vw, 0.95rem);
-      letter-spacing: 0.5em;
+      margin-top: clamp(0.8rem, 2vw, 1.4rem);
+      font-family: var(--display);
+      font-weight: 400;
+      font-size: clamp(0.65rem, 1.8vw, 0.88rem);
+      letter-spacing: 0.55em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: var(--cream-dim);
+    }
+
+    .sub-desarrollo {
+      margin-top: 0.4rem;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+      letter-spacing: 0.06em;
+      color: var(--cream-pale);
     }
 
     .sub-bocetos {
-      margin-top: clamp(0.4rem, 1.2vw, 0.7rem);
-      font-family: 'Cormorant Garamond', 'Palatino Linotype', serif;
+      margin-top: 0.3rem;
+      font-family: var(--serif);
       font-style: italic;
-      font-weight: 300;
-      font-size: clamp(0.65rem, 1.7vw, 0.82rem);
-      letter-spacing: 0.1em;
-      color: var(--dim);
+      font-size: clamp(0.62rem, 1.5vw, 0.78rem);
+      letter-spacing: 0.05em;
+      color: rgba(207,200,168,0.15);
     }
 
     .sep {
-      width: clamp(36px, 7vw, 72px);
+      width: clamp(40px, 8vw, 80px);
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--gold), transparent);
-      margin: clamp(1.4rem, 3.5vw, 2.2rem) auto 0;
+      margin: clamp(1.6rem, 4vw, 2.8rem) auto 0;
     }
 
-    /* ── Niveles ── */
+    /* ── Texto conceptual ───────────────────────────────── */
+    .concepto {
+      max-width: 620px;
+      text-align: center;
+      margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+      animation: surgir 1.4s cubic-bezier(.22,1,.36,1) 0.15s both;
+    }
+
+    .concepto__p {
+      font-size: clamp(0.88rem, 2.2vw, 1.08rem);
+      font-weight: 300;
+      line-height: 1.85;
+      color: var(--cream-dim);
+      margin-bottom: 1.2em;
+    }
+
+    .concepto__p:last-child { margin-bottom: 0; }
+
+    .sep-fino {
+      width: 1px;
+      height: clamp(28px, 5vh, 50px);
+      background: linear-gradient(to bottom, transparent, var(--border-h), transparent);
+      margin: clamp(2rem, 5vw, 3.5rem) auto;
+    }
+
+    /* ── Cards de nivel ─────────────────────────────────── */
     .niveles {
       display: grid;
       grid-template-columns: repeat(2, auto);
-      gap: clamp(2.5rem, 8vw, 6rem);
-      animation: appear 1.2s cubic-bezier(.22,1,.36,1) 0.25s both;
+      gap: clamp(2.5rem, 9vw, 7rem);
+      animation: surgir 1.4s cubic-bezier(.22,1,.36,1) 0.3s both;
     }
 
     @media (max-width: 440px) {
       .niveles { grid-template-columns: 1fr; gap: 3rem; }
     }
 
-    /* ── Card ── */
     .nivel-card {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: clamp(0.9rem, 2vw, 1.2rem);
+      gap: clamp(0.9rem, 2vw, 1.3rem);
       text-decoration: none;
       color: inherit;
       -webkit-tap-highlight-color: transparent;
@@ -129,33 +193,32 @@
 
     /* Círculo de piedra */
     .stone {
-      width:  clamp(108px, 19vw, 164px);
-      height: clamp(108px, 19vw, 164px);
+      width:  clamp(110px, 20vw, 170px);
+      height: clamp(110px, 20vw, 170px);
       border-radius: 50%;
       border: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: center;
       background:
-        radial-gradient(circle at 36% 28%, rgba(160,110,35,0.2) 0%, transparent 58%),
+        radial-gradient(circle at 36% 28%, rgba(78,106,74,0.28) 0%, transparent 60%),
         rgba(255,255,255,0.025);
       position: relative;
-      transition: transform 0.4s cubic-bezier(.22,1,.36,1),
-                  border-color 0.35s ease,
-                  box-shadow 0.4s ease;
+      transition:
+        transform 0.4s cubic-bezier(.22,1,.36,1),
+        border-color 0.35s ease,
+        box-shadow 0.4s ease;
     }
 
-    /* Anillo exterior sutil */
     .stone::before {
       content: '';
       position: absolute;
       inset: -7px;
       border-radius: 50%;
-      border: 1px solid rgba(200,148,30,0.09);
+      border: 1px solid rgba(184,144,80,0.09);
       transition: border-color 0.35s ease, inset 0.4s ease;
     }
 
-    /* Efecto de grieta/relieve rupestre al fondo del círculo */
     .stone::after {
       content: '';
       position: absolute;
@@ -171,16 +234,11 @@
       transform: translateY(-8px) scale(1.02);
       border-color: var(--border-h);
       box-shadow:
-        0 0 50px rgba(200,148,30,0.18),
-        0 16px 35px rgba(0,0,0,0.45);
+        0 0 60px rgba(184,144,80,0.18),
+        0 18px 40px var(--shadow);
     }
+    .nivel-card:hover .stone::before { border-color: rgba(184,144,80,0.28); inset: -10px; }
 
-    .nivel-card:hover .stone::before {
-      border-color: rgba(200,148,30,0.28);
-      inset: -10px;
-    }
-
-    /* Toque táctil en mobile */
     @media (hover: none) {
       .nivel-card:active .stone {
         transform: scale(0.96);
@@ -188,74 +246,136 @@
       }
     }
 
-    /* Numeral romano */
     .numeral {
-      font-family: 'Cinzel', 'Palatino Linotype', serif;
-      font-size: clamp(2rem, 5.5vw, 3.2rem);
+      font-family: var(--display);
+      font-size: clamp(2.1rem, 5.8vw, 3.4rem);
       color: var(--gold);
       letter-spacing: 0.08em;
       transition: color 0.3s ease;
       position: relative;
       z-index: 1;
     }
-
     .nivel-card:hover .numeral,
-    .nivel-card:focus-visible .numeral {
-      color: var(--gold-lt);
-    }
+    .nivel-card:focus-visible .numeral { color: var(--gold-lt); }
 
-    /* Título del nivel */
     .nivel-titulo {
-      font-family: 'Cormorant Garamond', 'Palatino Linotype', serif;
+      font-family: var(--serif);
       font-weight: 300;
-      font-size: clamp(0.75rem, 2.2vw, 1rem);
-      letter-spacing: 0.25em;
+      font-size: clamp(0.76rem, 2.2vw, 1rem);
+      letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: var(--cream-dim);
       text-align: center;
       transition: color 0.3s ease;
       max-width: 16ch;
-      line-height: 1.5;
+      line-height: 1.55;
     }
-
     .nivel-card:hover .nivel-titulo,
-    .nivel-card:focus-visible .nivel-titulo {
-      color: var(--cream);
+    .nivel-card:focus-visible .nivel-titulo { color: var(--cream); }
+
+    /* ── Logos (esquina inferior derecha) ───────────────── */
+    .logos-footer {
+      position: fixed;
+      bottom: max(18px, env(safe-area-inset-bottom));
+      right: max(18px, env(safe-area-inset-right));
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 14px;
     }
 
-    /* ── Animación ── */
-    @keyframes appear {
-      from { opacity: 0; transform: translateY(28px); }
-      to   { opacity: 1; transform: translateY(0);    }
+    .logo-img {
+      display: block;
+      height: clamp(28px, 4vh, 40px);
+      width: auto;
+      object-fit: contain;
+      opacity: 0.65;
+      transition: opacity 0.25s ease;
+    }
+
+    .logo-img:hover { opacity: 1; }
+
+    /* Mix-blend para transparencia de fondo sin procesar la imagen */
+    .logo-dark-bg  { mix-blend-mode: screen;   }   /* Táctil Lab (fondo negro) */
+    .logo-light-bg { mix-blend-mode: multiply;  }   /* SIGIT (fondo blanco) */
+
+    /* ── Animación ──────────────────────────────────────── */
+    @keyframes surgir {
+      from { opacity: 0; transform: translateY(32px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Mobile ─────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .concepto { padding: 0 0.5rem; }
+      .logos-footer { gap: 10px; }
+      .logo-img { height: clamp(22px, 6vw, 32px); }
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>Grito de Selva</h1>
-    <p class="sub-prototipo">Prototipo</p>
-    <p class="sub-bocetos">las imágenes y los audios son bocetos</p>
-    <div class="sep"></div>
-  </header>
+  <!-- Capas de fondo -->
+  <div class="fondo-foto" aria-hidden="true"></div>
+  <div class="fondo-velo" aria-hidden="true"></div>
+  <div class="fondo-ruido" aria-hidden="true"></div>
 
-  <nav class="niveles">
+  <div class="contenido">
 
-    <a class="nivel-card" href="nivel-5/index.html">
-      <div class="stone">
-        <span class="numeral">V</span>
-      </div>
-      <span class="nivel-titulo">El canto de los Espíritus</span>
-    </a>
+    <header>
+      <h1>Grito de Selva</h1>
+      <p class="sub-prototipo">Prototipo</p>
+      <p class="sub-desarrollo">actualmente el proyecto está en etapa de desarrollo</p>
+      <p class="sub-bocetos">las imágenes y los audios son bocetos</p>
+      <div class="sep"></div>
+    </header>
 
-    <a class="nivel-card" href="nivel-2/index.html">
-      <div class="stone">
-        <span class="numeral">II</span>
-      </div>
-      <span class="nivel-titulo">Los Colores de las Plantas</span>
-    </a>
+    <section class="concepto" aria-label="Sobre el proyecto">
+      <p class="concepto__p">
+        Grito de Selva propone un viaje sensorial a través de los territorios sonoros de América Latina.
+        Los Espíritus Hermanos son guardianes de la memoria colectiva: figuras rupestres que esperan ser
+        despertadas por la mano de quien juega, escucha y pinta.
+      </p>
+      <p class="concepto__p">
+        Desde un enfoque de salud pública y primera infancia, el proyecto invita a niños y niñas a
+        explorar lenguajes artísticos de los pueblos originarios —la máscara, el tambor, el pigmento—
+        como herramientas para el desarrollo sensorial, la construcción de identidad y el cuidado del territorio.
+      </p>
+    </section>
 
-  </nav>
+    <div class="sep-fino" aria-hidden="true"></div>
+
+    <nav class="niveles" aria-label="Niveles del prototipo">
+
+      <a class="nivel-card" href="nivel-5/index.html">
+        <div class="stone">
+          <span class="numeral">V</span>
+        </div>
+        <span class="nivel-titulo">El canto de los Espíritus</span>
+      </a>
+
+      <a class="nivel-card" href="nivel-2/index.html">
+        <div class="stone">
+          <span class="numeral">II</span>
+        </div>
+        <span class="nivel-titulo">Los Colores de las Plantas</span>
+      </a>
+
+    </nav>
+
+  </div>
+
+  <!-- Logos institucionales (colocar archivos en logos/) -->
+  <footer class="logos-footer" aria-label="Aliados">
+    <!--
+      Coloca los logos en prototipo/logos/ con estos nombres:
+        logos/tactil-lab.webp   (fondo oscuro → usa mix-blend-mode: screen)
+        logos/sigit.webp        (fondo claro  → usa mix-blend-mode: multiply)
+      Luego descomenta los <img> de abajo.
+    -->
+    <!-- <img class="logo-img logo-dark-bg"  src="logos/tactil-lab.webp" alt="Táctil Lab"> -->
+    <!-- <img class="logo-img logo-light-bg" src="logos/sigit.webp"      alt="SIGIT"> -->
+  </footer>
 
 </body>
 </html>

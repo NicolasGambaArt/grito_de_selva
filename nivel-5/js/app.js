@@ -170,6 +170,7 @@ function onPointerDown(e) {
   if (slot.classList.contains('disabled')) return;
   e.preventDefault();
   e.stopPropagation();
+  ocultarPreludio();
 
   const maskType = slot.dataset.mask;
   drag = { maskType };
@@ -241,6 +242,25 @@ function getHotspotAt(x, y) {
 }
 
 
+/* ── Preludio ────────────────────────────────────────────────────────────── */
+let preludioOculto = false;
+function ocultarPreludio() {
+  if (preludioOculto) return;
+  preludioOculto = true;
+  const el = document.getElementById('preludio');
+  if (el) el.classList.add('oculto');
+}
+
+/* ── Modal de instrucciones ──────────────────────────────────────────────── */
+function abrirModal() {
+  const m = document.getElementById('info-modal');
+  if (m) { m.classList.add('abierto'); m.setAttribute('aria-hidden', 'false'); }
+}
+function cerrarModal() {
+  const m = document.getElementById('info-modal');
+  if (m) { m.classList.remove('abierto'); m.setAttribute('aria-hidden', 'true'); }
+}
+
 /* ── Fullscreen (botón, no automático) ───────────────────────────────────── */
 function isFullscreen() {
   return !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
@@ -266,12 +286,24 @@ function init() {
   // Precargar imágenes animadas → elimina delay al soltar la primera máscara
   Object.values(COMBOS).forEach(c => { const i = new Image(); i.src = c.src; });
 
-  // Botón fullscreen (esquina inferior derecha)
+  // Botones UI
   const btnFs = document.getElementById('btn-fullscreen');
   if (btnFs) btnFs.addEventListener('click', toggleFullscreen);
   ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange'].forEach(ev =>
     document.addEventListener(ev, syncFsClass)
   );
+
+  const btnInfo = document.getElementById('btn-info');
+  if (btnInfo) btnInfo.addEventListener('click', abrirModal);
+
+  const btnInfoClose = document.getElementById('btn-info-close');
+  if (btnInfoClose) btnInfoClose.addEventListener('click', cerrarModal);
+
+  // Click fuera del panel cierra el modal
+  const modal = document.getElementById('info-modal');
+  if (modal) modal.addEventListener('click', (e) => {
+    if (e.target === modal) cerrarModal();
+  });
 
   // Posicionar rupestres en reposo
   [1, 2, 3].forEach(id => showChar(id, null));

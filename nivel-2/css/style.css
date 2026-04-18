@@ -258,7 +258,7 @@ body {
 }
 
 /* ============================================================
-   CONTROLES UI — botones home + fullscreen
+   CONTROLES UI — botones home + info + fullscreen
    ============================================================ */
 .ui-btn {
   position: fixed;
@@ -288,6 +288,7 @@ body {
   outline: none;
 }
 .ui-btn--home { top: max(14px, env(safe-area-inset-top));   left:  max(14px, env(safe-area-inset-left)); }
+.ui-btn--info { bottom: calc(max(14px, env(safe-area-inset-bottom)) + 56px); right: max(14px, env(safe-area-inset-right)); }
 .ui-btn--fs   { bottom: max(14px, env(safe-area-inset-bottom)); right: max(14px, env(safe-area-inset-right)); }
 
 .ui-btn--fs .ico-fs-off { display: none; }
@@ -383,9 +384,11 @@ body.is-fullscreen .ui-btn--fs .ico-fs-off { display: block; }
 
 
 /* ============================================================
-   MOBILE — portrait < 700px: tazas abajo en fila horizontal
+   MOBILE PORTRAIT — tazas abajo en fila horizontal
+   Solo se activa en portrait. En landscape se mantiene la
+   columna izquierda (igual que desktop), solo ajustando tamaño.
    ============================================================ */
-@media (max-width: 700px), (max-height: 500px) and (orientation: landscape) {
+@media (max-width: 700px) and (orientation: portrait) {
   .preludio {
     top: 7vh;
     width: min(90vw, 520px);
@@ -465,11 +468,13 @@ body.is-fullscreen .ui-btn--fs .ico-fs-off { display: block; }
     text-align: right;
   }
 
-  /* Botón fullscreen sube sobre la fila de tazas */
+  /* Botones suben sobre la fila de tazas */
   .ui-btn--fs {
     bottom: calc(130px + env(safe-area-inset-bottom, 0));
   }
-  /* Home deja paso al sello en la esquina superior */
+  .ui-btn--info {
+    bottom: calc(130px + env(safe-area-inset-bottom, 0) + 56px);
+  }
   .ui-btn--home {
     top: 14px;
     left: 14px;
@@ -500,11 +505,139 @@ body.is-fullscreen .ui-btn--fs .ico-fs-off { display: block; }
 }
 
 /* Muy estrecho — portrait teléfonos */
-@media (max-width: 400px) {
-  .preludio__titulo {
-    font-size: 22px;
+@media (max-width: 400px) and (orientation: portrait) {
+  .preludio__titulo { font-size: 22px; }
+  .taza { --size: clamp(52px, 18vw, 72px); }
+}
+
+/* ============================================================
+   MOBILE LANDSCAPE — columna izquierda, tazas más pequeñas
+   El layout de columna se mantiene como en desktop.
+   ============================================================ */
+@media (orientation: landscape) and (max-height: 500px) {
+  .taza { --size: clamp(48px, 10vh, 72px); }
+  .tazas {
+    gap: clamp(6px, 1.2vh, 14px);
   }
-  .taza {
-    --size: clamp(52px, 18vw, 72px);
+  .preludio {
+    top: 5vh;
+    width: min(82vw, 480px);
   }
+  .preludio__titulo { font-size: clamp(18px, 4vw, 26px); }
+  .preludio__nivel  { font-size: 9px; }
+
+  /* Sello achicado para landscape */
+  .sello {
+    right: clamp(70px, 2vw, 90px);
+    bottom: clamp(10px, 1.5vh, 18px);
+    font-size: 8px;
+  }
+
+  /* Botones UI en landscape mobile: más pequeños */
+  .ui-btn { width: 36px; height: 36px; }
+  .ui-btn svg { width: 16px; height: 16px; }
+  .ui-btn--info { bottom: calc(max(10px, env(safe-area-inset-bottom)) + 46px); }
+}
+
+/* ============================================================
+   MODAL DE INSTRUCCIONES
+   ============================================================ */
+.info-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 1rem max(1.5rem, env(safe-area-inset-bottom));
+  background: rgba(10, 6, 3, 0);
+  pointer-events: none;
+  transition: background 300ms ease;
+}
+
+.info-modal.abierto {
+  background: rgba(10, 6, 3, 0.65);
+  pointer-events: all;
+}
+
+.info-modal__panel {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(18, 10, 5, 0.94);
+  border: 1px solid var(--crema-sombra);
+  border-radius: 6px 6px 0 0;
+  padding: 1.6rem 1.8rem 2rem;
+  position: relative;
+  transform: translateY(110%);
+  transition: transform 380ms cubic-bezier(.22, 1, .36, 1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.info-modal.abierto .info-modal__panel {
+  transform: translateY(0);
+}
+
+.info-modal__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--crema-tenue);
+  cursor: pointer;
+  transition: color 200ms ease;
+}
+.info-modal__close:hover { color: var(--crema); }
+
+.info-modal__nivel {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--crema-tenue);
+  margin-bottom: 0.6rem;
+}
+
+.info-modal__titulo {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  color: var(--crema);
+  margin-bottom: 1rem;
+}
+
+.info-modal__texto {
+  font-family: var(--serif);
+  font-size: clamp(0.82rem, 1.8vw, 0.95rem);
+  line-height: 1.75;
+  color: rgba(240, 230, 204, 0.72);
+  margin-bottom: 1rem;
+}
+
+.info-modal__pasos {
+  list-style: none;
+  padding: 0;
+}
+.info-modal__pasos li {
+  font-family: var(--mono);
+  font-size: clamp(0.72rem, 1.5vw, 0.82rem);
+  color: rgba(240, 230, 204, 0.6);
+  line-height: 1.6;
+  padding-left: 1rem;
+  position: relative;
+  margin-bottom: 0.35rem;
+  letter-spacing: 0.06em;
+}
+.info-modal__pasos li::before {
+  content: '–';
+  position: absolute;
+  left: 0;
+  color: var(--crema-tenue);
 }

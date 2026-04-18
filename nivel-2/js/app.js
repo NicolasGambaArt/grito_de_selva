@@ -32,6 +32,16 @@
   const _btnFs = document.getElementById('btn-fullscreen');
   if (_btnFs) _btnFs.addEventListener('click', _toggleFs);
 
+  // Modal de instrucciones
+  const _openModal  = () => { const m = document.getElementById('info-modal'); if (m) { m.classList.add('abierto'); m.setAttribute('aria-hidden','false'); } };
+  const _closeModal = () => { const m = document.getElementById('info-modal'); if (m) { m.classList.remove('abierto'); m.setAttribute('aria-hidden','true'); } };
+  const _btnInfo = document.getElementById('btn-info');
+  if (_btnInfo) _btnInfo.addEventListener('click', _openModal);
+  const _btnInfoClose = document.getElementById('btn-info-close');
+  if (_btnInfoClose) _btnInfoClose.addEventListener('click', _closeModal);
+  const _modal = document.getElementById('info-modal');
+  if (_modal) _modal.addEventListener('click', (e) => { if (e.target === _modal) _closeModal(); });
+
   const $escena    = document.querySelector('.escena');
   const $preludio  = document.querySelector('.preludio');
   const $pitchLine = document.querySelector('.pitch-line');
