@@ -1,5 +1,5 @@
 /* ============================================================
-   audio.js — Motor de audio Grito de Selva · Nivel 2
+   audio.js — Motor de audio Los Colores de las Plantas · Nivel 2
    Síntesis procedural. Cada pigmento = voz distinta.
    Cada gesto = voz nueva con fade propio.
    ============================================================ */

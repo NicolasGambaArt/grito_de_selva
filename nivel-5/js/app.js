@@ -169,6 +169,7 @@ function onPointerDown(e) {
   const slot = e.currentTarget;
   if (slot.classList.contains('disabled')) return;
   e.preventDefault();
+  e.stopPropagation();
 
   const maskType = slot.dataset.mask;
   drag = { maskType };
@@ -181,12 +182,14 @@ function onPointerDown(e) {
   ghost.style.display = 'block';
   document.body.classList.add('is-dragging');
 
-  // Capturar puntero para seguir recibiendo eventos aunque salga del elemento
+  // setPointerCapture redirige todos los eventos al slot →
+  // funciona tanto en mouse como en touch sin listeners globales
   slot.setPointerCapture(e.pointerId);
 }
 
 function onPointerMove(e) {
   if (!drag) return;
+  e.preventDefault();
   ghost.style.left = e.clientX + 'px';
   ghost.style.top  = e.clientY + 'px';
 
@@ -203,7 +206,7 @@ function onPointerUp(e) {
   endDrag(e.clientX, e.clientY);
 }
 
-function onPointerCancel() {
+function onPointerCancel(e) {
   if (!drag) return;
   cancelDrag();
 }
@@ -238,8 +241,21 @@ function getHotspotAt(x, y) {
 }
 
 
+/* ── Fullscreen ──────────────────────────────────────────────────────────── */
+function requestFullscreen() {
+  const el = document.documentElement;
+  const fn = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
+  if (fn) fn.call(el).catch(() => {});
+}
+
 /* ── Init ────────────────────────────────────────────────────────────────── */
 function init() {
+  // Precargar imágenes animadas → elimina delay al soltar la primera máscara
+  Object.values(COMBOS).forEach(c => { const i = new Image(); i.src = c.src; });
+
+  // Fullscreen automático en primer toque (requiere gesto de usuario)
+  document.addEventListener('pointerdown', requestFullscreen, { once: true });
+
   // Posicionar rupestres en reposo
   [1, 2, 3].forEach(id => showChar(id, null));
 

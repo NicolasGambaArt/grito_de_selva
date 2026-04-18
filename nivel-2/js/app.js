@@ -13,6 +13,13 @@
   const VIDA_TRAZO_MS = 15000;
   const FADE_COLA_MS  = 5000;
 
+  // Fullscreen en primer toque
+  const _fs = document.documentElement;
+  document.addEventListener('pointerdown', () => {
+    const fn = _fs.requestFullscreen || _fs.webkitRequestFullscreen || _fs.mozRequestFullScreen;
+    if (fn) fn.call(_fs).catch(() => {});
+  }, { once: true });
+
   const $escena    = document.querySelector('.escena');
   const $preludio  = document.querySelector('.preludio');
   const $pitchLine = document.querySelector('.pitch-line');
