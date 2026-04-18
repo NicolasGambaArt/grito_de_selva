@@ -2,28 +2,18 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Espíritus Rupestres</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>El canto de los Espíritus</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div id="rotate-msg">
-    <div class="rotate-icon">⟳</div>
-    <p>Gira tu dispositivo<br>para jugar</p>
-  </div>
 
   <div id="app">
+
+    <!-- Escena: fondo + personajes + hotspots -->
     <div id="scene">
 
-      <!-- Fondo -->
       <img id="bg" src="assets/fondo-roca.webp" alt="">
-
-      <!-- Capas de personajes.
-           Estructura por capa:
-             .char-wrap.idle-wrap  → div con transform (posicionado por JS) + img rupestre
-             .char-wrap.anim-wrap  → div con transform (posicionado por JS) + img animado
-           El div recibe translate+scale. La img interior recibe rotate() del @keyframes.
-           Así los dos transforms nunca se pisan. -->
 
       <div class="char-layer" id="char-layer-1">
         <div class="char-wrap" id="idle-wrap-1">
@@ -52,15 +42,16 @@
         </div>
       </div>
 
-      <!-- Hotspots invisibles — data-char = id del personaje (1|2|3) -->
       <div class="drop-hotspot" id="hotspot-1" data-char="1"></div>
       <div class="drop-hotspot" id="hotspot-2" data-char="2"></div>
       <div class="drop-hotspot" id="hotspot-3" data-char="3"></div>
 
-      <!-- Texto de instrucción -->
       <div id="hint-text">arrastra las máscaras a los dibujos para darles vida</div>
 
-      <!-- Máscaras dentro de la escena — data-mask = tipo (viento|tierra|agua) -->
+    </div>
+
+    <!-- Bandeja de máscaras: en landscape flota sobre el scene; en portrait queda debajo -->
+    <div id="mask-tray">
       <div class="mask-slot available" id="slot-viento" data-mask="viento">
         <img src="assets/mascara_andin_01.webp" alt="Máscara 1" draggable="false">
       </div>
@@ -70,8 +61,25 @@
       <div class="mask-slot disabled" id="slot-agua" data-mask="agua">
         <img src="assets/mascara_alpin_03.webp" alt="Máscara 3" draggable="false">
       </div>
-
     </div>
+
+    <!-- Controles UI -->
+    <a class="ui-btn ui-btn--home" href="../index.html" aria-label="Volver al inicio" title="Inicio">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 11.5 12 4l9 7.5"/>
+        <path d="M5 10.5V20h14v-9.5"/>
+      </svg>
+    </a>
+
+    <button class="ui-btn ui-btn--fs" id="btn-fullscreen" aria-label="Pantalla completa" title="Pantalla completa" type="button">
+      <svg class="ico-fs-on"  viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/>
+      </svg>
+      <svg class="ico-fs-off" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M9 4v5H4"/><path d="M15 4v5h5"/><path d="M9 20v-5H4"/><path d="M15 20v-5h5"/>
+      </svg>
+    </button>
+
   </div>
 
   <!-- Audio preloaded — evita restricciones de fetch desde file:// -->
@@ -82,7 +90,6 @@
   <audio id="aud-percu02"  src="assets/percu02.ogg"  loop preload="auto"></audio>
   <audio id="aud-percu03"  src="assets/percu03.ogg"  loop preload="auto"></audio>
 
-  <!-- Ghost de arrastre -->
   <div id="drag-ghost">
     <img src="" alt="" draggable="false">
   </div>

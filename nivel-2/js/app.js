@@ -13,12 +13,24 @@
   const VIDA_TRAZO_MS = 15000;
   const FADE_COLA_MS  = 5000;
 
-  // Fullscreen en primer toque
-  const _fs = document.documentElement;
-  document.addEventListener('pointerdown', () => {
-    const fn = _fs.requestFullscreen || _fs.webkitRequestFullscreen || _fs.mozRequestFullScreen;
-    if (fn) fn.call(_fs).catch(() => {});
-  }, { once: true });
+  // Fullscreen bajo demanda (ver botón de esquina inferior derecha)
+  const _fsRoot = document.documentElement;
+  const _isFs = () => !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
+  const _enterFs = () => {
+    const fn = _fsRoot.requestFullscreen || _fsRoot.webkitRequestFullscreen || _fsRoot.mozRequestFullScreen;
+    if (fn) fn.call(_fsRoot).catch(() => {});
+  };
+  const _exitFs = () => {
+    const fn = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen;
+    if (fn) fn.call(document).catch(() => {});
+  };
+  const _toggleFs = () => { _isFs() ? _exitFs() : _enterFs(); };
+  const _syncFsClass = () => document.body.classList.toggle('is-fullscreen', _isFs());
+  ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange'].forEach(ev =>
+    document.addEventListener(ev, _syncFsClass)
+  );
+  const _btnFs = document.getElementById('btn-fullscreen');
+  if (_btnFs) _btnFs.addEventListener('click', _toggleFs);
 
   const $escena    = document.querySelector('.escena');
   const $preludio  = document.querySelector('.preludio');

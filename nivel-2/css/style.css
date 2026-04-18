@@ -235,7 +235,7 @@ body {
    ============================================================ */
 .sello {
   position: absolute;
-  right: clamp(16px, 2vw, 32px);
+  right: clamp(70px, 2vw, 90px);   /* deja espacio para el botón fullscreen */
   bottom: clamp(16px, 2vh, 28px);
   font-family: var(--mono);
   font-size: 10px;
@@ -256,6 +256,43 @@ body {
   font-size: 13px;
   color: var(--crema);
 }
+
+/* ============================================================
+   CONTROLES UI — botones home + fullscreen
+   ============================================================ */
+.ui-btn {
+  position: fixed;
+  z-index: 100;
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(18, 10, 5, 0.6);
+  border: 1px solid rgba(240, 230, 204, 0.25);
+  border-radius: 50%;
+  color: var(--crema);
+  cursor: pointer;
+  text-decoration: none;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background 200ms ease, color 200ms ease, transform 200ms ease, border-color 200ms ease;
+  padding: 0;
+}
+.ui-btn:hover,
+.ui-btn:focus-visible {
+  background: rgba(40, 26, 14, 0.78);
+  border-color: var(--crema-tenue);
+  color: var(--pigmento-amarillo);
+  transform: scale(1.06);
+  outline: none;
+}
+.ui-btn--home { top: max(14px, env(safe-area-inset-top));   left:  max(14px, env(safe-area-inset-left)); }
+.ui-btn--fs   { bottom: max(14px, env(safe-area-inset-bottom)); right: max(14px, env(safe-area-inset-right)); }
+
+.ui-btn--fs .ico-fs-off { display: none; }
+body.is-fullscreen .ui-btn--fs .ico-fs-on  { display: none; }
+body.is-fullscreen .ui-btn--fs .ico-fs-off { display: block; }
 
 /* ============================================================
    INDICADOR DE PITCH — línea sutil vertical mientras suena
@@ -426,6 +463,16 @@ body {
     bottom: auto;
     font-size: 9px;
     text-align: right;
+  }
+
+  /* Botón fullscreen sube sobre la fila de tazas */
+  .ui-btn--fs {
+    bottom: calc(130px + env(safe-area-inset-bottom, 0));
+  }
+  /* Home deja paso al sello en la esquina superior */
+  .ui-btn--home {
+    top: 14px;
+    left: 14px;
   }
 
   /* Tweaks — panel vertical arriba del área de tazas */

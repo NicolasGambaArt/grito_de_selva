@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════
-   Espíritus Rupestres — Estilos
+   El canto de los Espíritus — Estilos
    ═══════════════════════════════════════════════════════ */
 
 *, *::before, *::after {
@@ -25,20 +25,23 @@ body {
 }
 
 #app {
+  position: relative;
   width:  100vw;
   height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Escena principal ─────────────────────────────────── */
 #scene {
   position: relative;
+  flex: 1 1 auto;
   width: 100%;
-  height: 100%;
+  min-height: 0;
   overflow: hidden;
   isolation: isolate;
 }
 
-/* Imagen de fondo — cubre toda la escena sin distorsión */
 #bg {
   position: absolute;
   inset: 0;
@@ -49,13 +52,6 @@ body {
 }
 
 /* ── Capas de personajes ──────────────────────────────── */
-/*
-  Estructura de dos capas por personaje:
-    .char-wrap  → div que recibe transform-origin + translate+scale del JS
-    .char-img   → img dentro del div, recibe transform: rotate() del @keyframes
-
-  Los dos transforms están en ELEMENTOS DISTINTOS → no se pisan nunca.
-*/
 .char-layer {
   position: absolute;
   top: 0;
@@ -65,9 +61,6 @@ body {
   pointer-events: none;
 }
 
-/* El wrapper cubre toda la escena; el JS mueve+escala este div.
-   object-fit: contain en la img mantiene proporciones del sprite
-   y las zonas negras son invisibles por mix-blend-mode: screen. */
 .char-wrap {
   position: absolute;
   top: 0;
@@ -86,17 +79,11 @@ body {
   mix-blend-mode: screen;
 }
 
-/* Glow cuando se arrastra una máscara encima */
 .char-layer.dragover .char-img {
   filter: brightness(1.4) drop-shadow(0 0 10px rgba(220, 160, 60, 0.8));
 }
 
 /* ── Animaciones ──────────────────────────────────────── */
-/*
-  La clase se pone en el .anim-wrap (el div).
-  El @keyframes anima el transform de la .char-img DENTRO del div.
-  El div ya lleva translate+scale → la img rota dentro sin conflicto.
-*/
 .anim-wrap.anim-viento .char-img {
   animation: sway-viento 1.9s ease-in-out infinite;
   transform-origin: 50% 90%;
@@ -117,7 +104,7 @@ body {
   50%       { transform: rotate(2deg);  }
 }
 
-/* ── Hotspots — invisibles, calibrados sobre base01 ──── */
+/* ── Hotspots — invisibles ───────────────────────────── */
 .drop-hotspot {
   position: absolute;
   transform: translate(-50%, -50%);
@@ -125,44 +112,41 @@ body {
   cursor: crosshair;
 }
 
-#hotspot-1 {
-  left: 52%; top: 22%;
-  width: 12%; height: 17%;
-  /* debug → background: rgba(255,0,0,.3); outline: 2px dashed red; */
-}
+#hotspot-1 { left: 52%; top: 22%; width: 12%; height: 17%; }
+#hotspot-2 { left: 17%; top: 49%; width: 12%; height: 17%; }
+#hotspot-3 { left: 77%; top: 46%; width: 12%; height: 17%; }
 
-#hotspot-2 {
-  left: 17%; top: 49%;
-  width: 12%; height: 17%;
-  /* debug → background: rgba(0,255,0,.3); outline: 2px dashed lime; */
-}
-
-#hotspot-3 {
-  left: 77%; top: 46%;
-  width: 12%; height: 17%;
-  /* debug → background: rgba(0,120,255,.3); outline: 2px dashed cyan; */
-}
-
-/* ── Máscaras dentro de la escena ─────────────────────── */
+/* ── Bandeja de máscaras ─────────────────────────────── */
 /*
-  IMPORTANTE: width va en el .mask-slot (no en el img).
-  Así el div clickeable y la imagen tienen exactamente el mismo tamaño.
-  img usa width:100% para llenar el slot sin ambigüedad de porcentajes.
-
-  Con width:26% y 3 slots, los centros deben estar a ≥26% de distancia
-  entre sí para no solaparse → posiciones en 24%, 50%, 76%.
+  Landscape: flota superpuesta sobre el borde inferior del scene.
+  Portrait:  se convierte en barra fija debajo del scene (ver media query).
 */
-.mask-slot {
+#mask-tray {
   position: absolute;
-  width: 22%;
-  transform: translate(-50%, -50%);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 22%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 4vw, 48px);
+  pointer-events: none;   /* los slots lo re-activan */
+  z-index: 10;
+}
+
+/* ── Máscaras ─────────────────────────────────────────── */
+.mask-slot {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  pointer-events: auto;
   transition: transform 0.2s ease;
   -webkit-touch-callout: none;
-  touch-action: none;   /* evita scroll del browser durante el drag en mobile */
+  touch-action: none;
+  width: clamp(70px, 11vw, 150px);
 }
 
 .mask-slot img {
@@ -174,18 +158,14 @@ body {
   transition: filter 0.25s ease;
 }
 
-/* Máscara 1 (ramas anchas) → más grande; 2 y 3 más compactas */
-#slot-viento { left: 24%; top: 87%; width: 13%; }
-#slot-tierra { left: 50%; top: 87%; width: 10%; }
-#slot-agua   { left: 76%; top: 87%; width: 9%;  }
+/* Tamaños relativos entre máscaras (1 más ancha por las ramas) */
+#slot-viento { width: clamp(90px, 13vw, 180px); }
+#slot-tierra { width: clamp(70px, 10vw, 140px); }
+#slot-agua   { width: clamp(60px, 9vw,  120px); }
 
-/* Label "en desarrollo" flotando justo encima de la máscara de agua.
-   Se usa ::before para no afectar el tamaño ni alineación del slot. */
 #slot-agua::before {
   content: 'en desarrollo';
   position: absolute;
-  /* bottom: 85% coloca el label en el espacio en blanco que hay
-     sobre el gráfico visible de la máscara (~14% top de la imagen) */
   bottom: 85%;
   left: 50%;
   transform: translateX(-50%);
@@ -198,26 +178,17 @@ body {
   pointer-events: none;
 }
 
-/* Estado: disponible */
-.mask-slot.available {
-  cursor: grab;
-  transition: transform 0.2s ease;
-}
+.mask-slot.available { cursor: grab; }
 
 .mask-slot.available:hover {
-  transform: translate(-50%, calc(-50% - 6px));
+  transform: translateY(-6px);
 }
 
 .mask-slot.available:hover img {
   filter: brightness(1.25) drop-shadow(0 0 8px rgba(220, 160, 60, 0.6));
 }
 
-/* Estado: en uso — silueta negra.
-   El hover eleva el SLOT (no el img) para evitar el salto. */
-.mask-slot.in-use {
-  cursor: grab;
-  transition: transform 0.2s ease;
-}
+.mask-slot.in-use { cursor: grab; }
 
 .mask-slot.in-use img {
   filter: brightness(0);
@@ -226,14 +197,13 @@ body {
 }
 
 .mask-slot.in-use:hover {
-  transform: translate(-50%, calc(-50% - 4px));
+  transform: translateY(-4px);
 }
 
 .mask-slot.in-use:hover img {
   opacity: 0.8;
 }
 
-/* Estado: deshabilitada (agua — silueta permanente + texto) */
 .mask-slot.disabled {
   cursor: default;
   pointer-events: none;
@@ -242,17 +212,6 @@ body {
 .mask-slot.disabled img {
   filter: brightness(0);
   opacity: 0.65;
-}
-
-.dev-tag {
-  font-family: Georgia, serif;
-  font-size: clamp(7px, 0.75vw, 10px);
-  color: rgba(180, 150, 100, 0.55);
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  text-align: center;
-  white-space: nowrap;
-  margin-bottom: 2px;
 }
 
 /* Texto de instrucción superior */
@@ -269,63 +228,43 @@ body {
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
+  z-index: 5;
 }
 
-.soon-tag {
-  font-family: Georgia, serif;
-  font-size: clamp(6px, 0.7vw, 9px);
-  color: rgba(200, 169, 122, 0.4);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-align: center;
-  white-space: nowrap;
-}
-
-/* ── Mobile: portrait overlay ────────────────────────── */
-#rotate-msg {
-  display: none;
+/* ── Controles UI (home + fullscreen) ─────────────────── */
+.ui-btn {
   position: fixed;
-  inset: 0;
-  z-index: 10000;
-  background: #0c0905;
-  flex-direction: column;
+  z-index: 100;
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 1.2rem;
-  color: #e8c97a;
-  font-family: Georgia, serif;
-  text-align: center;
-  padding: 2rem;
+  background: rgba(12, 9, 5, 0.55);
+  border: 1px solid rgba(200, 169, 122, 0.35);
+  border-radius: 50%;
+  color: rgba(220, 190, 140, 0.85);
+  cursor: pointer;
+  text-decoration: none;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background 200ms ease, color 200ms ease, transform 200ms ease, border-color 200ms ease;
+  padding: 0;
 }
+.ui-btn:hover,
+.ui-btn:focus-visible {
+  background: rgba(30, 22, 12, 0.75);
+  color: rgba(240, 215, 160, 1);
+  border-color: rgba(220, 190, 140, 0.7);
+  transform: scale(1.06);
+  outline: none;
+}
+.ui-btn--home { top: max(14px, env(safe-area-inset-top));  left:  max(14px, env(safe-area-inset-left)); }
+.ui-btn--fs   { bottom: max(14px, env(safe-area-inset-bottom)); right: max(14px, env(safe-area-inset-right)); }
 
-#rotate-msg .rotate-icon {
-  font-size: clamp(2.5rem, 12vw, 4rem);
-  animation: spin-hint 2s ease-in-out infinite;
-}
-
-#rotate-msg p {
-  font-size: clamp(0.9rem, 4vw, 1.2rem);
-  line-height: 1.6;
-  opacity: 0.8;
-  letter-spacing: 0.06em;
-}
-
-@keyframes spin-hint {
-  0%, 100% { transform: rotate(0deg);   }
-  40%       { transform: rotate(90deg);  }
-  60%       { transform: rotate(90deg);  }
-}
-
-@media (orientation: portrait) {
-  #rotate-msg { display: flex; }
-}
-
-/* Landscape mobile: achica textos para pantallas bajas */
-@media (orientation: landscape) and (max-height: 480px) {
-  #hint-text            { font-size: 8px; }
-  .mask-slot            { width: 16%; }
-  #slot-agua::before    { font-size: 6px; }
-}
+.ui-btn--fs .ico-fs-off { display: none; }
+body.is-fullscreen .ui-btn--fs .ico-fs-on  { display: none; }
+body.is-fullscreen .ui-btn--fs .ico-fs-off { display: block; }
 
 /* ── Ghost de arrastre ────────────────────────────────── */
 #drag-ghost {
@@ -347,8 +286,52 @@ body {
   opacity: 0.88;
 }
 
-/* Cursor global mientras se arrastra */
 body.is-dragging,
 body.is-dragging * {
   cursor: grabbing !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PORTRAIT — escena arriba (16:9 letterbox), bandeja abajo
+   ═══════════════════════════════════════════════════════ */
+@media (orientation: portrait) {
+  #app {
+    flex-direction: column;
+  }
+  #scene {
+    flex: 0 0 auto;
+    width: 100vw;
+    height: 56.25vw;       /* 16:9 */
+    max-height: 75vh;
+  }
+  #bg {
+    object-fit: cover;     /* queda lleno dentro del scene 16:9 */
+  }
+  #mask-tray {
+    position: relative;
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    padding: clamp(8px, 2vh, 24px) clamp(8px, 3vw, 24px);
+    background: linear-gradient(
+      to bottom,
+      rgba(12, 9, 5, 0) 0%,
+      rgba(12, 9, 5, 0.85) 30%,
+      rgba(12, 9, 5, 0.95) 100%
+    );
+  }
+  .mask-slot       { width: clamp(70px, 20vw, 140px); }
+  #slot-viento     { width: clamp(90px, 26vw, 180px); }
+  #slot-tierra     { width: clamp(70px, 20vw, 140px); }
+  #slot-agua       { width: clamp(60px, 18vw, 120px); }
+
+  #hint-text { font-size: clamp(8px, 2.2vw, 13px); }
+}
+
+/* Landscape mobile bajo: achicar ligeramente */
+@media (orientation: landscape) and (max-height: 480px) {
+  #hint-text   { font-size: 8px; }
+  #mask-tray   { height: 26%; }
+  .ui-btn      { width: 36px; height: 36px; }
+  .ui-btn svg  { width: 16px; height: 16px; }
 }

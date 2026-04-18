@@ -58,6 +58,22 @@
 
   </main>
 
+  <!-- Controles UI (home + fullscreen) -->
+  <a class="ui-btn ui-btn--home" href="../index.html" aria-label="Volver al inicio" title="Inicio">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M3 11.5 12 4l9 7.5"/>
+      <path d="M5 10.5V20h14v-9.5"/>
+    </svg>
+  </a>
+  <button class="ui-btn ui-btn--fs" id="btn-fullscreen" aria-label="Pantalla completa" title="Pantalla completa" type="button">
+    <svg class="ico-fs-on"  viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/>
+    </svg>
+    <svg class="ico-fs-off" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M9 4v5H4"/><path d="M15 4v5h5"/><path d="M9 20v-5H4"/><path d="M15 20v-5h5"/>
+    </svg>
+  </button>
+
   <!-- Scripts -->
   <script src="js/audio.js?v=8"></script>
   <script src="js/canvas.js?v=8"></script>

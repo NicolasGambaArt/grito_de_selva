@@ -241,11 +241,24 @@ function getHotspotAt(x, y) {
 }
 
 
-/* ── Fullscreen ──────────────────────────────────────────────────────────── */
-function requestFullscreen() {
+/* ── Fullscreen (botón, no automático) ───────────────────────────────────── */
+function isFullscreen() {
+  return !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
+}
+function enterFullscreen() {
   const el = document.documentElement;
   const fn = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
   if (fn) fn.call(el).catch(() => {});
+}
+function exitFullscreen() {
+  const fn = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen;
+  if (fn) fn.call(document).catch(() => {});
+}
+function toggleFullscreen() {
+  if (isFullscreen()) exitFullscreen(); else enterFullscreen();
+}
+function syncFsClass() {
+  document.body.classList.toggle('is-fullscreen', isFullscreen());
 }
 
 /* ── Init ────────────────────────────────────────────────────────────────── */
@@ -253,8 +266,12 @@ function init() {
   // Precargar imágenes animadas → elimina delay al soltar la primera máscara
   Object.values(COMBOS).forEach(c => { const i = new Image(); i.src = c.src; });
 
-  // Fullscreen automático en primer toque (requiere gesto de usuario)
-  document.addEventListener('pointerdown', requestFullscreen, { once: true });
+  // Botón fullscreen (esquina inferior derecha)
+  const btnFs = document.getElementById('btn-fullscreen');
+  if (btnFs) btnFs.addEventListener('click', toggleFullscreen);
+  ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange'].forEach(ev =>
+    document.addEventListener(ev, syncFsClass)
+  );
 
   // Posicionar rupestres en reposo
   [1, 2, 3].forEach(id => showChar(id, null));
