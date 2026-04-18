@@ -1,0 +1,353 @@
+/* ═══════════════════════════════════════════════════════
+   Espíritus Rupestres — Estilos
+   ═══════════════════════════════════════════════════════ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Layout base ──────────────────────────────────────── */
+html, body {
+  width: 100%;
+  height: 100%;
+  background: #0c0905;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#app {
+  width:  100vw;
+  height: 100vh;
+}
+
+/* ── Escena principal ─────────────────────────────────── */
+#scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Imagen de fondo — cubre toda la escena sin distorsión */
+#bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* ── Capas de personajes ──────────────────────────────── */
+/*
+  Estructura de dos capas por personaje:
+    .char-wrap  → div que recibe transform-origin + translate+scale del JS
+    .char-img   → img dentro del div, recibe transform: rotate() del @keyframes
+
+  Los dos transforms están en ELEMENTOS DISTINTOS → no se pisan nunca.
+*/
+.char-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* El wrapper cubre toda la escena; el JS mueve+escala este div.
+   object-fit: contain en la img mantiene proporciones del sprite
+   y las zonas negras son invisibles por mix-blend-mode: screen. */
+.char-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.25s ease;
+}
+
+.char-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  mix-blend-mode: screen;
+}
+
+/* Glow cuando se arrastra una máscara encima */
+.char-layer.dragover .char-img {
+  filter: brightness(1.4) drop-shadow(0 0 10px rgba(220, 160, 60, 0.8));
+}
+
+/* ── Animaciones ──────────────────────────────────────── */
+/*
+  La clase se pone en el .anim-wrap (el div).
+  El @keyframes anima el transform de la .char-img DENTRO del div.
+  El div ya lleva translate+scale → la img rota dentro sin conflicto.
+*/
+.anim-wrap.anim-viento .char-img {
+  animation: sway-viento 1.9s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+
+.anim-wrap.anim-tierra .char-img {
+  animation: sway-tierra 2.6s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+
+@keyframes sway-viento {
+  0%, 100% { transform: rotate(-3.5deg); }
+  50%       { transform: rotate(3.5deg);  }
+}
+
+@keyframes sway-tierra {
+  0%, 100% { transform: rotate(-2deg); }
+  50%       { transform: rotate(2deg);  }
+}
+
+/* ── Hotspots — invisibles, calibrados sobre base01 ──── */
+.drop-hotspot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: all;
+  cursor: crosshair;
+}
+
+#hotspot-1 {
+  left: 52%; top: 22%;
+  width: 12%; height: 17%;
+  /* debug → background: rgba(255,0,0,.3); outline: 2px dashed red; */
+}
+
+#hotspot-2 {
+  left: 17%; top: 49%;
+  width: 12%; height: 17%;
+  /* debug → background: rgba(0,255,0,.3); outline: 2px dashed lime; */
+}
+
+#hotspot-3 {
+  left: 77%; top: 46%;
+  width: 12%; height: 17%;
+  /* debug → background: rgba(0,120,255,.3); outline: 2px dashed cyan; */
+}
+
+/* ── Máscaras dentro de la escena ─────────────────────── */
+/*
+  IMPORTANTE: width va en el .mask-slot (no en el img).
+  Así el div clickeable y la imagen tienen exactamente el mismo tamaño.
+  img usa width:100% para llenar el slot sin ambigüedad de porcentajes.
+
+  Con width:26% y 3 slots, los centros deben estar a ≥26% de distancia
+  entre sí para no solaparse → posiciones en 24%, 50%, 76%.
+*/
+.mask-slot {
+  position: absolute;
+  width: 22%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: transform 0.2s ease;
+  -webkit-touch-callout: none;
+}
+
+.mask-slot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  transition: filter 0.25s ease;
+}
+
+/* Máscara 1 (ramas anchas) → más grande; 2 y 3 más compactas */
+#slot-viento { left: 24%; top: 87%; width: 13%; }
+#slot-tierra { left: 50%; top: 87%; width: 10%; }
+#slot-agua   { left: 76%; top: 87%; width: 9%;  }
+
+/* Label "en desarrollo" flotando justo encima de la máscara de agua.
+   Se usa ::before para no afectar el tamaño ni alineación del slot. */
+#slot-agua::before {
+  content: 'en desarrollo';
+  position: absolute;
+  /* bottom: 85% coloca el label en el espacio en blanco que hay
+     sobre el gráfico visible de la máscara (~14% top de la imagen) */
+  bottom: 85%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: Georgia, serif;
+  font-size: clamp(7px, 0.8vw, 11px);
+  color: rgba(180, 150, 100, 0.6);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Estado: disponible */
+.mask-slot.available {
+  cursor: grab;
+  transition: transform 0.2s ease;
+}
+
+.mask-slot.available:hover {
+  transform: translate(-50%, calc(-50% - 6px));
+}
+
+.mask-slot.available:hover img {
+  filter: brightness(1.25) drop-shadow(0 0 8px rgba(220, 160, 60, 0.6));
+}
+
+/* Estado: en uso — silueta negra.
+   El hover eleva el SLOT (no el img) para evitar el salto. */
+.mask-slot.in-use {
+  cursor: grab;
+  transition: transform 0.2s ease;
+}
+
+.mask-slot.in-use img {
+  filter: brightness(0);
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
+}
+
+.mask-slot.in-use:hover {
+  transform: translate(-50%, calc(-50% - 4px));
+}
+
+.mask-slot.in-use:hover img {
+  opacity: 0.8;
+}
+
+/* Estado: deshabilitada (agua — silueta permanente + texto) */
+.mask-slot.disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.mask-slot.disabled img {
+  filter: brightness(0);
+  opacity: 0.65;
+}
+
+.dev-tag {
+  font-family: Georgia, serif;
+  font-size: clamp(7px, 0.75vw, 10px);
+  color: rgba(180, 150, 100, 0.55);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+  margin-bottom: 2px;
+}
+
+/* Texto de instrucción superior */
+#hint-text {
+  position: absolute;
+  top: 3%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: Georgia, serif;
+  font-size: clamp(9px, 1vw, 14px);
+  color: rgba(200, 169, 122, 0.55);
+  letter-spacing: 0.1em;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.soon-tag {
+  font-family: Georgia, serif;
+  font-size: clamp(6px, 0.7vw, 9px);
+  color: rgba(200, 169, 122, 0.4);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ── Mobile: portrait overlay ────────────────────────── */
+#rotate-msg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: #0c0905;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  color: #e8c97a;
+  font-family: Georgia, serif;
+  text-align: center;
+  padding: 2rem;
+}
+
+#rotate-msg .rotate-icon {
+  font-size: clamp(2.5rem, 12vw, 4rem);
+  animation: spin-hint 2s ease-in-out infinite;
+}
+
+#rotate-msg p {
+  font-size: clamp(0.9rem, 4vw, 1.2rem);
+  line-height: 1.6;
+  opacity: 0.8;
+  letter-spacing: 0.06em;
+}
+
+@keyframes spin-hint {
+  0%, 100% { transform: rotate(0deg);   }
+  40%       { transform: rotate(90deg);  }
+  60%       { transform: rotate(90deg);  }
+}
+
+@media (orientation: portrait) {
+  #rotate-msg { display: flex; }
+}
+
+/* Landscape mobile: achica textos para pantallas bajas */
+@media (orientation: landscape) and (max-height: 480px) {
+  #hint-text            { font-size: 8px; }
+  .mask-slot            { width: 16%; }
+  #slot-agua::before    { font-size: 6px; }
+}
+
+/* ── Ghost de arrastre ────────────────────────────────── */
+#drag-ghost {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+}
+
+#drag-ghost img {
+  display: block;
+  width: clamp(60px, 8vw, 100px);
+  height: auto;
+  mix-blend-mode: screen;
+  filter: brightness(1.4) drop-shadow(0 4px 20px rgba(220, 160, 60, 0.7));
+  opacity: 0.88;
+}
+
+/* Cursor global mientras se arrastra */
+body.is-dragging,
+body.is-dragging * {
+  cursor: grabbing !important;
+}

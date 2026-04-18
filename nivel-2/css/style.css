@@ -1,0 +1,463 @@
+/* ============================================================
+   Espíritus Hermanos — Nivel 2
+   "Pintar la roca" — paisaje sonoro territorial
+   ============================================================ */
+
+:root {
+  /* Paleta territorial — rupestre, cálida, oscura */
+  --bg-noche:       #120a05;
+  --bg-tierra:      #1a1208;
+  --crema:          #f0e6cc;
+  --crema-tenue:    rgba(240, 230, 204, 0.55);
+  --crema-sombra:   rgba(240, 230, 204, 0.12);
+
+  /* Pigmentos — refinados contra la roca oscura */
+  --pigmento-amarillo: #d6a435;
+  --pigmento-rojo:     #b04a2a;
+  --pigmento-verde:    #7a8a3a;
+  --pigmento-azul:     #3a4a8a;
+
+  /* Glow de selección — tono cálido de fogata */
+  --glow-activo:    rgba(242, 194, 98, 0.55);
+
+  /* Timings */
+  --fade-trazo:     15s;
+  --fade-ui:        400ms;
+  --respiracion:    4.5s;
+
+  /* Tipografía */
+  --serif: "Cormorant Garamond", "EB Garamond", Georgia, "Times New Roman", serif;
+  --mono:  "Iosevka", "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+
+/* ---------- reset mínimo ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; overscroll-behavior: none; }
+
+body {
+  background: var(--bg-noche);
+  color: var(--crema);
+  font-family: var(--serif);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+
+/* ============================================================
+   ESCENA — full viewport, fondo de roca con vignette
+   ============================================================ */
+.escena {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--bg-tierra);
+}
+
+.escena__fondo {
+  position: absolute;
+  inset: 0;
+  background-image: url("../assets/fondo_roca.webp");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* La roca ocupa todo; sutil desaturación para que los trazos resalten */
+  filter: saturate(0.92) brightness(0.95);
+}
+
+.escena__viñeta {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 55% 50%,
+      transparent 0%,
+      transparent 55%,
+      rgba(10, 6, 3, 0.35) 85%,
+      rgba(10, 6, 3, 0.65) 100%);
+  mix-blend-mode: multiply;
+}
+
+/* ============================================================
+   CANVAS DE DIBUJO — superpuesto a la roca
+   ============================================================ */
+.lienzo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+/* ============================================================
+   PANEL DE TAZAS — columna izquierda, estética de estante
+   ============================================================ */
+.tazas {
+  position: absolute;
+  left: clamp(16px, 2.5vw, 40px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.6vh, 22px);
+  z-index: 10;
+  pointer-events: none; /* las tazas individuales lo re-activan */
+}
+
+.taza {
+  --size: clamp(72px, 9vw, 112px);
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+  pointer-events: auto;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: 0;
+  transition: transform var(--fade-ui) cubic-bezier(.2, .8, .2, 1),
+              filter    var(--fade-ui) ease;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.55))
+          brightness(0.85);
+}
+
+.taza img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  display: block;
+}
+
+.taza:hover {
+  transform: scale(1.06) translateX(4px);
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.6))
+          brightness(1);
+}
+
+.taza.is-activa {
+  transform: scale(1.18) translateX(10px);
+  filter: drop-shadow(0 0 24px var(--glow-activo))
+          drop-shadow(0 6px 14px rgba(0, 0, 0, 0.6))
+          brightness(1.08);
+}
+
+/* Anillo luminoso bajo la taza activa — respira mientras dibujas */
+.taza.is-activa::before {
+  content: "";
+  position: absolute;
+  inset: -14%;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    var(--glow-activo) 0%,
+    transparent 62%);
+  z-index: -1;
+  animation: respirar var(--respiracion) ease-in-out infinite;
+}
+
+.taza.is-sonando::before {
+  animation-duration: 1.4s;
+}
+
+@keyframes respirar {
+  0%, 100% { opacity: 0.55; transform: scale(0.92); }
+  50%      { opacity: 0.95; transform: scale(1.08); }
+}
+
+/* Etiqueta sutil de cada pigmento — solo al hover */
+.taza__etiqueta {
+  position: absolute;
+  left: calc(100% + 14px);
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--crema-tenue);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity var(--fade-ui) ease, transform var(--fade-ui) ease;
+  pointer-events: none;
+}
+.taza:hover .taza__etiqueta,
+.taza.is-activa .taza__etiqueta {
+  opacity: 0.85;
+  transform: translateY(-50%) translateX(2px);
+}
+
+/* ============================================================
+   TÍTULO / INSTRUCCIÓN — aparece al inicio, desaparece al primer gesto
+   ============================================================ */
+.preludio {
+  position: absolute;
+  left: 50%;
+  top: clamp(32px, 7vh, 80px);
+  transform: translateX(-50%);
+  text-align: center;
+  color: var(--crema);
+  pointer-events: none;
+  transition: opacity 1.6s ease;
+  z-index: 5;
+}
+
+.preludio.oculto { opacity: 0; }
+
+.preludio__nivel {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--crema-tenue);
+  margin-bottom: 14px;
+}
+
+.preludio__titulo {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(28px, 3.2vw, 44px);
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.7);
+}
+
+.preludio__instruccion {
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--crema-tenue);
+}
+
+/* ============================================================
+   SELLO INFERIOR — marca del proyecto, minimal
+   ============================================================ */
+.sello {
+  position: absolute;
+  right: clamp(16px, 2vw, 32px);
+  bottom: clamp(16px, 2vh, 28px);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--crema-tenue);
+  text-align: right;
+  line-height: 1.8;
+  pointer-events: none;
+  z-index: 5;
+}
+.sello span { display: block; }
+.sello .sello__obra {
+  font-family: var(--serif);
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-size: 13px;
+  color: var(--crema);
+}
+
+/* ============================================================
+   INDICADOR DE PITCH — línea sutil vertical mientras suena
+   ============================================================ */
+.pitch-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--glow-activo);
+  box-shadow: 0 0 10px var(--glow-activo);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+  z-index: 4;
+}
+.pitch-line.visible { opacity: 0.35; }
+
+/* ============================================================
+   TWEAKS PANEL
+   ============================================================ */
+.tweaks {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 18px;
+  background: rgba(18, 10, 5, 0.88);
+  border: 1px solid var(--crema-sombra);
+  color: var(--crema);
+  padding: 10px 18px;
+  z-index: 100;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(8px);
+  display: none;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  border-radius: 2px;
+}
+.tweaks.abierto { display: block; }
+.tweaks h3 {
+  display: none; /* compact horizontal bar */
+}
+.tweaks__fila {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+.tweaks label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 150px;
+}
+.tweaks label span {
+  display: flex;
+  justify-content: space-between;
+  color: var(--crema-tenue);
+  text-transform: uppercase;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+}
+.tweaks label span b {
+  font-weight: 400;
+  color: var(--crema);
+}
+.tweaks input[type="range"] {
+  width: 100%;
+  accent-color: var(--pigmento-amarillo);
+}
+.tweaks button.limpiar {
+  background: transparent;
+  color: var(--crema);
+  border: 1px solid var(--crema-sombra);
+  padding: 8px 14px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 200ms ease;
+  white-space: nowrap;
+}
+.tweaks button.limpiar:hover {
+  background: var(--crema-sombra);
+  border-color: var(--crema-tenue);
+}
+
+
+/* ============================================================
+   MOBILE — portrait < 700px: tazas abajo en fila horizontal
+   ============================================================ */
+@media (max-width: 700px), (max-height: 500px) and (orientation: landscape) {
+  .preludio {
+    top: 7vh;
+    width: min(90vw, 520px);
+  }
+  .preludio__titulo {
+    font-size: clamp(22px, 6vw, 32px);
+    line-height: 1.15;
+  }
+  .preludio__nivel {
+    font-size: 10px;
+  }
+  .preludio__instruccion {
+    font-size: 11px;
+  }
+
+  /* Tazas — fila horizontal fija abajo */
+  .tazas {
+    left: 0;
+    right: 0;
+    top: auto;
+    bottom: env(safe-area-inset-bottom, 0);
+    padding: 14px clamp(12px, 4vw, 24px) calc(18px + env(safe-area-inset-bottom, 0));
+    transform: none;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    gap: clamp(8px, 2vw, 18px);
+    background: linear-gradient(
+      to top,
+      rgba(10, 8, 6, 0.78) 0%,
+      rgba(10, 8, 6, 0.55) 45%,
+      rgba(10, 8, 6, 0) 100%
+    );
+    z-index: 20;
+  }
+
+  .taza {
+    --size: clamp(56px, 16vw, 78px);
+  }
+
+  /* Hover en mobile no tiene sentido — estado activo es el que manda */
+  .taza:hover {
+    transform: none;
+    filter: drop-shadow(0 6px 14px rgba(0,0,0,0.5));
+  }
+  .taza.is-activa {
+    transform: scale(1.14);
+    filter: drop-shadow(0 0 20px var(--glow-activo))
+            drop-shadow(0 8px 16px rgba(0,0,0,0.6));
+  }
+  .taza.is-activa::before {
+    inset: -10%;
+  }
+
+  /* Etiquetas: arriba de la taza, siempre visible en la activa */
+  .taza__etiqueta {
+    left: 50%;
+    top: -22px;
+    transform: translateX(-50%);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    opacity: 0;
+    white-space: nowrap;
+  }
+  .taza:hover .taza__etiqueta,
+  .taza.is-activa .taza__etiqueta {
+    opacity: 0.9;
+    transform: translateX(-50%) translateY(-2px);
+  }
+
+  /* Sello — arriba a la derecha para no chocar con las tazas */
+  .sello {
+    top: 16px;
+    right: 14px;
+    bottom: auto;
+    font-size: 9px;
+    text-align: right;
+  }
+
+  /* Tweaks — panel vertical arriba del área de tazas */
+  .tweaks {
+    left: 12px;
+    right: 12px;
+    bottom: calc(120px + env(safe-area-inset-bottom, 0));
+    transform: none;
+    padding: 12px 14px;
+    max-width: none;
+  }
+  .tweaks__fila {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .tweaks label {
+    min-width: 0;
+  }
+  .tweaks button.limpiar {
+    width: 100%;
+  }
+
+  /* Lienzo no debe recibir tap en zona de tazas — ya controlado por z-index */
+}
+
+/* Muy estrecho — portrait teléfonos */
+@media (max-width: 400px) {
+  .preludio__titulo {
+    font-size: 22px;
+  }
+  .taza {
+    --size: clamp(52px, 18vw, 72px);
+  }
+}

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grito de Selva</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:         #0c0803;
+      --gold:       #c8941e;
+      --gold-lt:    #e8c97a;
+      --cream:      #f2e4c4;
+      --muted:      rgba(242,228,196,0.42);
+      --dim:        rgba(242,228,196,0.22);
+      --border:     rgba(200,148,30,0.22);
+      --border-h:   rgba(200,148,30,0.65);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--bg);
+      color: var(--cream);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(2.5rem, 8vw, 5rem) clamp(1.5rem, 6vw, 3rem);
+      overflow-x: hidden;
+    }
+
+    /* ── Texturas de fondo ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
+      background-size: 250px 250px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 65% at 50% 44%, rgba(150,90,15,0.13) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header, nav, .nivel-card { position: relative; z-index: 1; }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      margin-bottom: clamp(3rem, 7vw, 5.5rem);
+      animation: appear 1.2s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    h1 {
+      font-family: 'Cinzel', 'Palatino Linotype', serif;
+      font-weight: 600;
+      font-size: clamp(2.4rem, 9vw, 6rem);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold-lt);
+      line-height: 1;
+      text-shadow:
+        0 0 80px rgba(232,201,122,0.22),
+        0 2px 0 rgba(0,0,0,0.6);
+    }
+
+    .sub-prototipo {
+      margin-top: clamp(1rem, 2.8vw, 1.7rem);
+      font-family: 'Cormorant Garamond', 'Palatino Linotype', serif;
+      font-weight: 300;
+      font-size: clamp(0.7rem, 2vw, 0.95rem);
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .sub-bocetos {
+      margin-top: clamp(0.4rem, 1.2vw, 0.7rem);
+      font-family: 'Cormorant Garamond', 'Palatino Linotype', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(0.65rem, 1.7vw, 0.82rem);
+      letter-spacing: 0.1em;
+      color: var(--dim);
+    }
+
+    .sep {
+      width: clamp(36px, 7vw, 72px);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: clamp(1.4rem, 3.5vw, 2.2rem) auto 0;
+    }
+
+    /* ── Niveles ── */
+    .niveles {
+      display: grid;
+      grid-template-columns: repeat(2, auto);
+      gap: clamp(2.5rem, 8vw, 6rem);
+      animation: appear 1.2s cubic-bezier(.22,1,.36,1) 0.25s both;
+    }
+
+    @media (max-width: 440px) {
+      .niveles { grid-template-columns: 1fr; gap: 3rem; }
+    }
+
+    /* ── Card ── */
+    .nivel-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(0.9rem, 2vw, 1.2rem);
+      text-decoration: none;
+      color: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Círculo de piedra */
+    .stone {
+      width:  clamp(108px, 19vw, 164px);
+      height: clamp(108px, 19vw, 164px);
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 36% 28%, rgba(160,110,35,0.2) 0%, transparent 58%),
+        rgba(255,255,255,0.025);
+      position: relative;
+      transition: transform 0.4s cubic-bezier(.22,1,.36,1),
+                  border-color 0.35s ease,
+                  box-shadow 0.4s ease;
+    }
+
+    /* Anillo exterior sutil */
+    .stone::before {
+      content: '';
+      position: absolute;
+      inset: -7px;
+      border-radius: 50%;
+      border: 1px solid rgba(200,148,30,0.09);
+      transition: border-color 0.35s ease, inset 0.4s ease;
+    }
+
+    /* Efecto de grieta/relieve rupestre al fondo del círculo */
+    .stone::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      background-size: 100% 100%;
+      pointer-events: none;
+    }
+
+    .nivel-card:hover .stone,
+    .nivel-card:focus-visible .stone {
+      transform: translateY(-8px) scale(1.02);
+      border-color: var(--border-h);
+      box-shadow:
+        0 0 50px rgba(200,148,30,0.18),
+        0 16px 35px rgba(0,0,0,0.45);
+    }
+
+    .nivel-card:hover .stone::before {
+      border-color: rgba(200,148,30,0.28);
+      inset: -10px;
+    }
+
+    /* Toque táctil en mobile */
+    @media (hover: none) {
+      .nivel-card:active .stone {
+        transform: scale(0.96);
+        border-color: var(--border-h);
+      }
+    }
+
+    /* Numeral romano */
+    .numeral {
+      font-family: 'Cinzel', 'Palatino Linotype', serif;
+      font-size: clamp(2rem, 5.5vw, 3.2rem);
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      transition: color 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .nivel-card:hover .numeral,
+    .nivel-card:focus-visible .numeral {
+      color: var(--gold-lt);
+    }
+
+    /* Título del nivel */
+    .nivel-titulo {
+      font-family: 'Cormorant Garamond', 'Palatino Linotype', serif;
+      font-weight: 300;
+      font-size: clamp(0.75rem, 2.2vw, 1rem);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+      transition: color 0.3s ease;
+      max-width: 16ch;
+      line-height: 1.5;
+    }
+
+    .nivel-card:hover .nivel-titulo,
+    .nivel-card:focus-visible .nivel-titulo {
+      color: var(--cream);
+    }
+
+    /* ── Animación ── */
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0);    }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Grito de Selva</h1>
+    <p class="sub-prototipo">Prototipo</p>
+    <p class="sub-bocetos">las imágenes y los audios son bocetos</p>
+    <div class="sep"></div>
+  </header>
+
+  <nav class="niveles">
+
+    <a class="nivel-card" href="nivel-5/index.html">
+      <div class="stone">
+        <span class="numeral">V</span>
+      </div>
+      <span class="nivel-titulo">El canto de los Espíritus</span>
+    </a>
+
+    <a class="nivel-card" href="nivel-2/index.html">
+      <div class="stone">
+        <span class="numeral">II</span>
+      </div>
+      <span class="nivel-titulo">Grito de Selva</span>
+    </a>
+
+  </nav>
+
+</body>
+</html>

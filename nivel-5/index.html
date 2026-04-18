@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Espíritus Rupestres</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="rotate-msg">
+    <div class="rotate-icon">⟳</div>
+    <p>Gira tu dispositivo<br>para jugar</p>
+  </div>
+
+  <div id="app">
+    <div id="scene">
+
+      <!-- Fondo -->
+      <img id="bg" src="assets/fondo-roca.webp" alt="">
+
+      <!-- Capas de personajes.
+           Estructura por capa:
+             .char-wrap.idle-wrap  → div con transform (posicionado por JS) + img rupestre
+             .char-wrap.anim-wrap  → div con transform (posicionado por JS) + img animado
+           El div recibe translate+scale. La img interior recibe rotate() del @keyframes.
+           Así los dos transforms nunca se pisan. -->
+
+      <div class="char-layer" id="char-layer-1">
+        <div class="char-wrap" id="idle-wrap-1">
+          <img class="char-img" src="assets/rupestre01.webp" alt="" draggable="false">
+        </div>
+        <div class="char-wrap anim-wrap" id="anim-wrap-1" style="opacity:0">
+          <img class="char-img" src="" alt="" draggable="false">
+        </div>
+      </div>
+
+      <div class="char-layer" id="char-layer-2">
+        <div class="char-wrap" id="idle-wrap-2">
+          <img class="char-img" src="assets/rupestre02.webp" alt="" draggable="false">
+        </div>
+        <div class="char-wrap anim-wrap" id="anim-wrap-2" style="opacity:0">
+          <img class="char-img" src="" alt="" draggable="false">
+        </div>
+      </div>
+
+      <div class="char-layer" id="char-layer-3">
+        <div class="char-wrap" id="idle-wrap-3">
+          <img class="char-img" src="assets/rupestre03.webp" alt="" draggable="false">
+        </div>
+        <div class="char-wrap anim-wrap" id="anim-wrap-3" style="opacity:0">
+          <img class="char-img" src="" alt="" draggable="false">
+        </div>
+      </div>
+
+      <!-- Hotspots invisibles — data-char = id del personaje (1|2|3) -->
+      <div class="drop-hotspot" id="hotspot-1" data-char="1"></div>
+      <div class="drop-hotspot" id="hotspot-2" data-char="2"></div>
+      <div class="drop-hotspot" id="hotspot-3" data-char="3"></div>
+
+      <!-- Texto de instrucción -->
+      <div id="hint-text">arrastra las máscaras a los dibujos para darles vida</div>
+
+      <!-- Máscaras dentro de la escena — data-mask = tipo (viento|tierra|agua) -->
+      <div class="mask-slot available" id="slot-viento" data-mask="viento">
+        <img src="assets/mascara_andin_01.webp" alt="Máscara 1" draggable="false">
+      </div>
+      <div class="mask-slot available" id="slot-tierra" data-mask="tierra">
+        <img src="assets/mascara_andin_02.webp" alt="Máscara 2" draggable="false">
+      </div>
+      <div class="mask-slot disabled" id="slot-agua" data-mask="agua">
+        <img src="assets/mascara_alpin_03.webp" alt="Máscara 3" draggable="false">
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Audio preloaded — evita restricciones de fetch desde file:// -->
+  <audio id="aud-flauta01" src="assets/flauta01.ogg" loop preload="auto"></audio>
+  <audio id="aud-flauta02" src="assets/flauta02.ogg" loop preload="auto"></audio>
+  <audio id="aud-flauta03" src="assets/flauta03.ogg" loop preload="auto"></audio>
+  <audio id="aud-percu01"  src="assets/percu01.ogg"  loop preload="auto"></audio>
+  <audio id="aud-percu02"  src="assets/percu02.ogg"  loop preload="auto"></audio>
+  <audio id="aud-percu03"  src="assets/percu03.ogg"  loop preload="auto"></audio>
+
+  <!-- Ghost de arrastre -->
+  <div id="drag-ghost">
+    <img src="" alt="" draggable="false">
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

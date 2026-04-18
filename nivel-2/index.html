@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Espíritus Hermanos — Nivel 2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=4" />
+</head>
+<body>
+
+  <!-- ESCENA — fondo de roca + canvas + tazas -->
+  <main class="escena" data-screen-label="Nivel 2 · Pintar la roca">
+
+    <div class="escena__fondo"   aria-hidden="true"></div>
+    <div class="escena__viñeta" aria-hidden="true"></div>
+
+    <!-- Indicador visual del pitch (línea horizontal sutil) -->
+    <div class="pitch-line" aria-hidden="true"></div>
+
+    <!-- Canvas de dibujo — superpuesto a la roca -->
+    <canvas class="lienzo" aria-label="Lienzo de pintura rupestre"></canvas>
+
+    <!-- Panel izquierdo — tazas apiladas -->
+    <aside class="tazas" aria-label="Pigmentos">
+      <button class="taza" data-pigmento="amarillo" aria-label="Cúrcuma">
+        <img src="assets/taza_amarillo.webp" alt="" />
+        <span class="taza__etiqueta">Cúrcuma</span>
+      </button>
+      <button class="taza" data-pigmento="rojo" aria-label="Achiote">
+        <img src="assets/taza_rojo.webp" alt="" />
+        <span class="taza__etiqueta">Achiote</span>
+      </button>
+      <button class="taza" data-pigmento="verde" aria-label="Hojas de chilca">
+        <img src="assets/taza_verde.webp" alt="" />
+        <span class="taza__etiqueta">Hojas de chilca</span>
+      </button>
+      <button class="taza" data-pigmento="azul" aria-label="Jagua">
+        <img src="assets/taza_azul.webp" alt="" />
+        <span class="taza__etiqueta">Jagua</span>
+      </button>
+    </aside>
+
+    <!-- Preludio — instrucción inicial, desaparece al primer gesto -->
+    <header class="preludio">
+      <div class="preludio__nivel">Nivel II · Espíritus Hermanos</div>
+      <div class="preludio__titulo">Pinta la roca para oír el territorio</div>
+      <div class="preludio__instruccion">elige un pigmento · arrastra · escucha</div>
+    </header>
+
+    <!-- Sello del proyecto -->
+    <footer class="sello" aria-hidden="true">
+      <span class="sello__obra">Grito de Selva</span>
+      <span>Nivel 02 / 05</span>
+    </footer>
+
+  </main>
+
+  <!-- Scripts -->
+  <script src="js/audio.js?v=8"></script>
+  <script src="js/canvas.js?v=8"></script>
+  <script src="js/app.js?v=8"></script>
+
+</body>
+</html>
