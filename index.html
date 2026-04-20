@@ -93,23 +93,22 @@
     }
 
     .sub-desarrollo {
-      margin-top: 0.4rem;
+      margin-top: 0.5rem;
       font-family: var(--serif);
       font-style: italic;
-      font-size: clamp(0.7rem,1.8vw,0.9rem);
+      font-size: clamp(0.82rem, 2vw, 1rem);
       letter-spacing: 0.06em;
       color: var(--cream);
-      opacity: 0.58;
     }
 
     .sub-bocetos {
-      margin-top: 0.3rem;
+      margin-top: 0.35rem;
       font-family: var(--serif);
       font-style: italic;
-      font-size: clamp(0.62rem,1.5vw,0.78rem);
+      font-size: clamp(0.78rem, 1.8vw, 0.92rem);
       letter-spacing: 0.05em;
       color: var(--cream);
-      opacity: 0.32;
+      opacity: 0.72;
     }
 
     .sep {
@@ -252,22 +251,33 @@
     /* ── Logos ──────────────────────────────────────────── */
     .logos-footer {
       position: fixed;
-      bottom: max(18px, env(safe-area-inset-bottom));
-      right: max(18px, env(safe-area-inset-right));
+      bottom: max(16px, env(safe-area-inset-bottom));
+      right:  max(16px, env(safe-area-inset-right));
       z-index: 10;
-      display: flex; align-items: center; gap: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .logos-fila {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
     .logo-img {
       display: block;
-      height: clamp(26px, 3.8vh, 38px);
-      width: auto; object-fit: contain;
+      height: 28px;
+      width: auto;
+      max-width: 180px;
+      object-fit: contain;
       opacity: 0.7;
       transition: opacity 0.25s ease;
+      filter: brightness(1.1);
     }
     .logo-img:hover { opacity: 1; }
-    .logo-dark-bg  { mix-blend-mode: screen;   }
-    .logo-light-bg { mix-blend-mode: multiply;  }
+    /* Logos con fondo oscuro removido → se ven sobre bg oscuro sin blend mode */
 
     /* ── Animación ──────────────────────────────────────── */
     @keyframes surgir {
@@ -343,12 +353,21 @@
 
   </div>
 
-  <!-- Logos institucionales — coloca los archivos en logos/ y descomenta -->
   <footer class="logos-footer" aria-label="Aliados">
-    <img class="logo-img logo-dark-bg"  src="logos/tactil-lab.webp" alt="Táctil Lab"
-         onerror="this.style.display='none'">
-    <img class="logo-img logo-light-bg" src="logos/sigit.webp"      alt="SIGIT"
-         onerror="this.style.display='none'">
+    <!-- Fila superior: íconos cuadrados -->
+    <div class="logos-fila">
+      <img class="logo-img" src="logos/logo-asset12.webp" alt=""
+           onerror="this.style.display='none'">
+      <img class="logo-img" src="logos/logo-tactil.webp"  alt="Táctil Lab"
+           onerror="this.style.display='none'">
+    </div>
+    <!-- Fila inferior: logotipos horizontales -->
+    <div class="logos-fila">
+      <img class="logo-img" src="logos/logo-cocrea.webp" alt="CoCrea"
+           onerror="this.style.display='none'">
+      <img class="logo-img" src="logos/logo-sigit.webp"  alt="SIGIT Uniandes"
+           onerror="this.style.display='none'">
+    </div>
   </footer>
 
   <script>
