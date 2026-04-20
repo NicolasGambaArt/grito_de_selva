@@ -262,11 +262,11 @@
 
     .logo-img {
       display: block;
-      height: 22px;       /* tamaño homogéneo — ancho se ajusta automáticamente */
-      width: auto;
-      max-width: 120px;   /* evita wordmarks demasiado anchos */
+      /* Canvas 220×52 idéntico en todos → mismo ancho = mismo tamaño visual */
+      width: 100px;
+      height: auto;
       object-fit: contain;
-      opacity: 0.65;
+      opacity: 0.68;
       transition: opacity 0.25s ease;
       filter: brightness(1.1);
     }
