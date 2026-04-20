@@ -251,28 +251,24 @@
     /* ── Logos ──────────────────────────────────────────── */
     .logos-footer {
       position: fixed;
-      bottom: max(16px, env(safe-area-inset-bottom));
-      right:  max(16px, env(safe-area-inset-right));
+      bottom: max(14px, env(safe-area-inset-bottom));
+      right:  max(14px, env(safe-area-inset-right));
       z-index: 10;
       display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 10px;
+      flex-direction: row;
+      align-items: center;
+      gap: 16px;
     }
 
     .logo-img {
       display: block;
-      /* Canvas 220×52 idéntico en todos → mismo ancho = mismo tamaño visual */
-      width: 100px;
-      height: auto;
+      height: clamp(32px, 5vw, 48px);
+      width: auto;
       object-fit: contain;
-      opacity: 0.68;
+      opacity: 0.72;
       transition: opacity 0.25s ease;
-      filter: brightness(1.1);
     }
     .logo-img:hover { opacity: 1; }
-    .logo-img:nth-child(1),
-    .logo-img:nth-child(2) { width: 50px; }
 
     /* ── Animación ──────────────────────────────────────── */
     @keyframes surgir {
@@ -282,8 +278,6 @@
 
     @media (max-width: 600px) {
       .concepto { padding: 0 0.5rem; }
-      .logos-footer { gap: 10px; }
-      .logo-img { height: clamp(22px, 6vw, 30px); }
     }
   </style>
 </head>
@@ -305,14 +299,17 @@
 
     <section class="concepto" aria-label="Sobre el proyecto">
       <p class="concepto__p">
-        Grito de Selva propone un viaje sensorial a través de los territorios sonoros de América Latina.
-        Los Espíritus Hermanos son guardianes de la memoria colectiva: figuras rupestres que esperan ser
-        despertadas por la mano de quien juega, escucha y pinta.
+        Grito de Selva habita la tensión entre el saber ancestral y las nuevas tecnologías. Es un
+        dispositivo de diálogo entre los espíritus de selva y los espíritus de ciudad: Andin y Alpin
+        —hermanos, custodios de dos territorios que se buscan— encarnan ese encuentro y abren la
+        posibilidad de que la memoria del bosque converse con los lenguajes digitales de hoy.
       </p>
       <p class="concepto__p">
-        Desde un enfoque de salud pública y primera infancia, el proyecto invita a niños y niñas a
-        explorar lenguajes artísticos de los pueblos originarios —la máscara, el tambor, el pigmento—
-        como herramientas para el desarrollo sensorial, la construcción de identidad y el cuidado del territorio.
+        El proyecto se articula desde un enfoque de neurodesarrollo en primera infancia, a cargo del
+        grupo de investigación SIGIT (Sistemas de salud en Infancia, Género, Interculturalidad y
+        Trópico), como respuesta al daño cognitivo que las nuevas tecnologías están generando en las
+        infancias rurales y citadinas. La máscara, el tambor y el pigmento aparecen aquí como
+        mediaciones sensoriales que reparan lo que las pantallas han empezado a erosionar.
       </p>
     </section>
 
@@ -349,10 +346,10 @@
   </div>
 
   <footer class="logos-footer" aria-label="Aliados">
-    <img class="logo-img" src="logos/logo-asset12.webp" alt=""               onerror="this.style.display='none'">
-    <img class="logo-img" src="logos/logo-tactil.webp"  alt="Táctil Lab"     onerror="this.style.display='none'">
-    <img class="logo-img" src="logos/logo-cocrea.webp"  alt="CoCrea"         onerror="this.style.display='none'">
-    <img class="logo-img" src="logos/logo-sigit.webp"   alt="SIGIT Uniandes" onerror="this.style.display='none'">
+    <img class="logo-img" src="logos/logo-ebra.webp"   alt=""               onerror="this.style.display='none'">
+    <img class="logo-img" src="logos/logo-tactil.webp" alt="Táctil Lab"     onerror="this.style.display='none'">
+    <img class="logo-img" src="logos/logo-sigit.webp"  alt="SIGIT Uniandes" onerror="this.style.display='none'">
+    <img class="logo-img" src="logos/logo-cocrea.webp" alt="CoCrea"         onerror="this.style.display='none'">
   </footer>
 
   <script>

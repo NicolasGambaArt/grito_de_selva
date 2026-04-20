@@ -2,107 +2,59 @@
    El canto de los Espíritus — Estilos
    ═══════════════════════════════════════════════════════ */
 
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   background: #0c0905;
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
 }
 
-body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+body { display: flex; justify-content: center; align-items: center; }
 
-/* ── App: siempre full-viewport ───────────────────────── */
 #app {
   position: relative;
-  width:  100vw;
-  height: 100vh;
+  width: 100vw; height: 100vh;
 }
 
-/* ── Escena: ocupa todo el app ──────────────────────────
-   La bandeja de máscaras (#mask-tray) se posiciona
-   absolutamente sobre la parte inferior de la escena.      */
 #scene {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  isolation: isolate;
+  position: absolute; inset: 0;
+  overflow: hidden; isolation: isolate;
 }
 
 #bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
 }
 
-/* ── Capas de personajes ──────────────────────────────── */
+/* ── Capas de personajes ─────────────────────────────────
+   Cada rupestre ocupa la capa completa. Las coords de la
+   figura (tx, ty, scale) se aplican vía CSS custom props.
+   ───────────────────────────────────────────────────────── */
 .char-layer {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   pointer-events: none;
 }
 
 .char-wrap {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   transition: opacity 0.25s ease;
 }
 
 .char-img {
   display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center;
+  width: 100%; height: 100%;
+  object-fit: contain; object-position: center;
   mix-blend-mode: screen;
 }
 
-.char-layer.dragover .char-img {
-  filter: brightness(1.4) drop-shadow(0 0 10px rgba(220, 160, 60, 0.8));
-}
-
-/* ── Animaciones ──────────────────────────────────────── */
-.anim-wrap.anim-viento .char-img {
-  animation: sway-viento 1.9s ease-in-out infinite;
-  transform-origin: 50% 90%;
-}
-
-.anim-wrap.anim-tierra .char-img {
-  animation: sway-tierra 2.6s ease-in-out infinite;
-  transform-origin: 50% 90%;
-}
-
-@keyframes sway-viento {
-  0%, 100% { transform: rotate(-3.5deg); }
-  50%       { transform: rotate(3.5deg);  }
-}
-
-@keyframes sway-tierra {
-  0%, 100% { transform: rotate(-2deg); }
-  50%       { transform: rotate(2deg);  }
-}
-
-/* ── Hotspots ─────────────────────────────────────────── */
 .drop-hotspot {
   position: absolute;
   transform: translate(-50%, -50%);
@@ -110,15 +62,71 @@ body {
   cursor: crosshair;
 }
 
-#hotspot-1 { left: 52%; top: 22%; width: 12%; height: 17%; }
-#hotspot-2 { left: 17%; top: 49%; width: 12%; height: 17%; }
-#hotspot-3 { left: 77%; top: 46%; width: 12%; height: 17%; }
+/* ── Posiciones de los 9 rupestres + hotspots ────────────
+   Variables CSS para facilitar el ajuste fino.           */
+.char-layer[data-rupestre="a1"], .drop-hotspot[data-rupestre="a1"] { --tx: 44%; --ty: 14%; }
+.char-layer[data-rupestre="a2"], .drop-hotspot[data-rupestre="a2"] { --tx: 51%; --ty: 19%; }
+.char-layer[data-rupestre="a3"], .drop-hotspot[data-rupestre="a3"] { --tx: 59%; --ty: 16%; }
 
-/* ── Preludio ─────────────────────────────────────────── */
+.char-layer[data-rupestre="p1"], .drop-hotspot[data-rupestre="p1"] { --tx: 30%; --ty: 42%; }
+.char-layer[data-rupestre="p2"], .drop-hotspot[data-rupestre="p2"] { --tx: 24%; --ty: 56%; }
+.char-layer[data-rupestre="p3"], .drop-hotspot[data-rupestre="p3"] { --tx: 31%; --ty: 69%; }
+
+.char-layer[data-rupestre="m1"], .drop-hotspot[data-rupestre="m1"] { --tx: 67%; --ty: 49%; }
+.char-layer[data-rupestre="m2"], .drop-hotspot[data-rupestre="m2"] { --tx: 74%; --ty: 61%; }
+.char-layer[data-rupestre="m3"], .drop-hotspot[data-rupestre="m3"] { --tx: 65%; --ty: 64%; }
+
+.drop-hotspot {
+  left: var(--tx); top: var(--ty);
+  width: 9%; height: 13%;
+}
+
+/* ── Animaciones (balanceo suave por familia sonora) ───── */
+.anim-wrap.anim-viento .char-img {
+  animation: sway-viento 1.9s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+.anim-wrap.anim-percu .char-img {
+  animation: sway-percu 2.6s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+.anim-wrap.anim-sinte .char-img {
+  animation: sway-sinte 3.2s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+
+@keyframes sway-viento {
+  0%, 100% { transform: rotate(-3.5deg); }
+  50%      { transform: rotate(3.5deg); }
+}
+@keyframes sway-percu {
+  0%, 100% { transform: rotate(-2deg) translateY(0); }
+  50%      { transform: rotate(2deg) translateY(-2px); }
+}
+@keyframes sway-sinte {
+  0%, 100% { transform: rotate(-1.5deg) scale(1); }
+  50%      { transform: rotate(1.5deg) scale(1.03); }
+}
+
+.char-layer.dragover .char-img {
+  filter: brightness(1.4) drop-shadow(0 0 10px rgba(220, 160, 60, 0.8));
+}
+
+/* Modo silueta: esperando la próxima puerta del reloj */
+.char-wrap.silhouette .char-img {
+  filter: brightness(0.18) contrast(1.6) drop-shadow(0 0 6px rgba(220, 180, 120, 0.45));
+  opacity: 0.72;
+  animation: silhouette-pulse 1.2s ease-in-out infinite;
+}
+@keyframes silhouette-pulse {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.9; }
+}
+
+/* ── Preludio ────────────────────────────────────────── */
 .preludio {
   position: absolute;
-  left: 50%;
-  top: clamp(24px, 5vh, 60px);
+  left: 50%; top: clamp(24px, 5vh, 60px);
   transform: translateX(-50%);
   text-align: center;
   pointer-events: none;
@@ -126,20 +134,16 @@ body {
   z-index: 8;
   white-space: nowrap;
 }
-
 .preludio.oculto { opacity: 0; }
-
 .preludio__nivel {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: Georgia, serif;
   font-size: clamp(9px, 1.1vw, 12px);
-  letter-spacing: 0.42em;
-  text-transform: uppercase;
+  letter-spacing: 0.42em; text-transform: uppercase;
   color: rgba(200, 169, 122, 0.65);
   margin-bottom: 12px;
 }
-
 .preludio__titulo {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: Georgia, serif;
   font-style: italic;
   font-size: clamp(30px, 3.8vw, 52px);
   color: rgba(230, 212, 170, 0.96);
@@ -148,9 +152,8 @@ body {
   line-height: 1.15;
   margin-bottom: 16px;
 }
-
 .preludio__instruccion {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: Georgia, serif;
   font-style: italic;
   font-size: clamp(14px, 1.7vw, 20px);
   letter-spacing: 0.04em;
@@ -158,11 +161,9 @@ body {
   line-height: 1.65;
 }
 
-/* ── Hint text (permanente, sutil) ───────────────────── */
 #hint-text {
   position: absolute;
-  top: 3%;
-  left: 50%;
+  top: 3%; left: 50%;
   transform: translateX(-50%);
   font-family: Georgia, serif;
   font-size: clamp(8px, 0.85vw, 12px);
@@ -171,11 +172,9 @@ body {
   text-align: center;
   white-space: nowrap;
   pointer-events: none;
-  user-select: none;
   z-index: 5;
 }
 
-/* ── Sello inferior ───────────────────────────────────── */
 .sello {
   position: absolute;
   left: clamp(14px, 2vw, 28px);
@@ -189,9 +188,7 @@ body {
   pointer-events: none;
   z-index: 5;
 }
-
 .sello span { display: block; }
-
 .sello__obra {
   font-style: italic;
   text-transform: none;
@@ -200,25 +197,94 @@ body {
   color: rgba(220, 196, 152, 0.55);
 }
 
-/* ── Bandeja de máscaras ─────────────────────────────────────
-   position: absolute sobre la parte inferior del #app.
-   Funciona igual en landscape y portrait — solo cambian
-   alturas y tamaños de slot en portrait (ver media query).     */
+/* ═══════════════════════════════════════════════════════
+   RELOJ MAESTRO — anillo con progreso + puertas 0s/4.8s
+   ═══════════════════════════════════════════════════════ */
+#loop-deck {
+  position: absolute;
+  left: 50%;
+  bottom: calc(22% + 16px);
+  transform: translateX(-50%);
+  z-index: 15;
+  opacity: 0.95;
+  transition: opacity 0.3s ease;
+}
+
+.pause-btn {
+  --p: 0;
+  position: relative;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: rgba(30, 22, 12, 0.85);
+  border: none;
+  color: rgba(240, 215, 160, 0.95);
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+  padding: 0;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.pause-btn:hover { transform: scale(1.06); background: rgba(50, 36, 18, 0.9); }
+
+.master-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+.master-ring .ring-bg {
+  fill: none;
+  stroke: rgba(200, 169, 122, 0.22);
+  stroke-width: 2;
+}
+.master-ring .ring-prog {
+  fill: none;
+  stroke: rgba(230, 200, 140, 0.85);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  /* circunferencia r=20 → 2π·20 ≈ 125.66 */
+  stroke-dasharray: 125.66;
+  stroke-dashoffset: calc(125.66 * (1 - var(--p)));
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transition: stroke 0.25s ease;
+}
+.master-ring .gate {
+  stroke: rgba(230, 200, 140, 0.65);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+#loop-deck.is-empty        { opacity: 0.55; }
+#loop-deck.is-empty .ring-prog { stroke: rgba(200, 169, 122, 0.35); }
+#loop-deck.paused .ring-prog   { stroke: rgba(200, 130, 90, 0.75); }
+
+.pause-btn .ico-pause { display: none; }
+.pause-btn .ico-play  { display: block; margin-left: 2px; }
+#loop-deck.is-running .pause-btn .ico-pause { display: block; margin-left: 0; }
+#loop-deck.is-running .pause-btn .ico-play  { display: none; }
+
+/* Parpadeo del anillo en la entrada de puerta */
+#loop-deck.gate-flash .ring-prog {
+  stroke: rgba(255, 230, 180, 1);
+  filter: drop-shadow(0 0 8px rgba(255, 220, 160, 0.9));
+}
+
+/* ── Bandeja de máscaras ─────────────────────────────── */
 #mask-tray {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 0; left: 0; right: 0;
   height: 22%;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: center; justify-content: center;
   gap: clamp(16px, 4vw, 52px);
   pointer-events: none;
   z-index: 10;
 }
 
-/* ── Máscaras ─────────────────────────────────────────── */
 .mask-slot {
   position: relative;
   display: flex;
@@ -234,65 +300,47 @@ body {
 
 .mask-slot img {
   display: block;
-  width: 100%;
-  height: auto;
+  width: 100%; height: auto;
   mix-blend-mode: multiply;
   pointer-events: none;
   transition: filter 0.25s ease;
 }
 
-/* Tamaños relativos entre máscaras */
-#slot-viento { width: clamp(80px, 12vw, 165px); }
-#slot-tierra { width: clamp(65px, 9.5vw, 135px); }
-#slot-agua   { width: clamp(55px, 8.5vw, 115px); }
-
-.dev-tag {
-  font-family: Georgia, serif;
-  font-size: clamp(6px, 0.7vw, 10px);
-  color: rgba(180, 150, 100, 0.5);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-align: center;
-  white-space: nowrap;
-  margin-bottom: 2px;
-}
+#mask-tray .mask-slot[data-mask="viento"] { width: clamp(80px, 12vw, 165px); }
+#mask-tray .mask-slot[data-mask="percu"]  { width: clamp(65px, 9.5vw, 135px); }
+#mask-tray .mask-slot[data-mask="sinte"]  { width: clamp(65px, 9vw, 130px); }
 
 .mask-slot.available { cursor: grab; }
-
-.mask-slot.available:hover {
-  transform: translateY(-6px);
-}
+.mask-slot.available:hover { transform: translateY(-6px); }
 .mask-slot.available:hover img {
   filter: brightness(1.25) drop-shadow(0 0 8px rgba(220, 160, 60, 0.6));
 }
 
-.mask-slot.in-use { cursor: grab; }
-.mask-slot.in-use img {
-  filter: brightness(0);
-  opacity: 0.55;
-  transition: opacity 0.2s ease;
-}
-.mask-slot.in-use:hover { transform: translateY(-4px); }
-.mask-slot.in-use:hover img { opacity: 0.8; }
-
-.mask-slot.disabled {
-  cursor: default;
+/* Indicador de cantidad de rupestres activos con esta máscara */
+.mask-slot .badge {
+  position: absolute;
+  top: -4px; right: -4px;
+  min-width: 18px; height: 18px;
+  padding: 0 5px;
+  background: rgba(220, 160, 60, 0.92);
+  color: #0c0905;
+  font-family: Georgia, serif;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 10px;
+  display: none;
+  align-items: center; justify-content: center;
   pointer-events: none;
 }
-.mask-slot.disabled img {
-  filter: brightness(0);
-  opacity: 0.55;
-}
+.mask-slot.in-use .badge { display: inline-flex; }
 
 /* ── Controles UI ─────────────────────────────────────── */
 .ui-btn {
   position: fixed;
   z-index: 100;
-  width: 42px;
-  height: 42px;
+  width: 42px; height: 42px;
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  align-items: center; justify-content: center;
   background: rgba(12, 9, 5, 0.55);
   border: 1px solid rgba(200, 169, 122, 0.35);
   border-radius: 50%;
@@ -301,12 +349,10 @@ body {
   text-decoration: none;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  transition: background 200ms ease, color 200ms ease,
-              transform 200ms ease, border-color 200ms ease;
+  transition: background 200ms ease, color 200ms ease, transform 200ms ease, border-color 200ms ease;
   padding: 0;
 }
-.ui-btn:hover,
-.ui-btn:focus-visible {
+.ui-btn:hover, .ui-btn:focus-visible {
   background: rgba(30, 22, 12, 0.78);
   color: rgba(240, 215, 160, 1);
   border-color: rgba(220, 190, 140, 0.7);
@@ -314,47 +360,28 @@ body {
   outline: none;
 }
 
-/* Posiciones */
-.ui-btn--home {
-  top:  max(14px, env(safe-area-inset-top));
-  left: max(14px, env(safe-area-inset-left));
-}
-.ui-btn--info {
-  bottom: calc(max(14px, env(safe-area-inset-bottom)) + 56px);
-  right:  max(14px, env(safe-area-inset-right));
-}
-.ui-btn--fs {
-  bottom: max(14px, env(safe-area-inset-bottom));
-  right:  max(14px, env(safe-area-inset-right));
-}
+.ui-btn--home { top: max(14px, env(safe-area-inset-top)); left: max(14px, env(safe-area-inset-left)); }
+.ui-btn--info { bottom: calc(max(14px, env(safe-area-inset-bottom)) + 56px); right: max(14px, env(safe-area-inset-right)); }
+.ui-btn--fs   { bottom: max(14px, env(safe-area-inset-bottom)); right: max(14px, env(safe-area-inset-right)); }
 
-/* Toggle icono fullscreen */
 .ui-btn--fs .ico-fs-off { display: none; }
 body.is-fullscreen .ui-btn--fs .ico-fs-on  { display: none; }
 body.is-fullscreen .ui-btn--fs .ico-fs-off { display: block; }
 
-/* ── Modal de instrucciones ───────────────────────────── */
+/* ── Modal instrucciones ──────────────────────────────── */
 .info-modal {
-  position: fixed;
-  inset: 0;
+  position: fixed; inset: 0;
   z-index: 200;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  align-items: flex-end; justify-content: center;
   padding: 0 1rem max(1.5rem, env(safe-area-inset-bottom));
   background: rgba(8, 6, 3, 0);
   pointer-events: none;
   transition: background 300ms ease;
 }
-
-.info-modal.abierto {
-  background: rgba(8, 6, 3, 0.65);
-  pointer-events: all;
-}
-
+.info-modal.abierto { background: rgba(8, 6, 3, 0.65); pointer-events: all; }
 .info-modal__panel {
-  width: 100%;
-  max-width: 480px;
+  width: 100%; max-width: 480px;
   background: rgba(18, 13, 7, 0.92);
   border: 1px solid rgba(200, 169, 122, 0.3);
   border-radius: 6px 6px 0 0;
@@ -365,46 +392,31 @@ body.is-fullscreen .ui-btn--fs .ico-fs-off { display: block; }
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
-
-.info-modal.abierto .info-modal__panel {
-  transform: translateY(0);
-}
-
+.info-modal.abierto .info-modal__panel { transform: translateY(0); }
 .info-modal__close {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
+  position: absolute; top: 1rem; right: 1rem;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none;
   color: rgba(200, 169, 122, 0.65);
   cursor: pointer;
   transition: color 200ms ease;
 }
 .info-modal__close:hover { color: rgba(240, 215, 160, 1); }
-
 .info-modal__nivel {
   font-family: Georgia, serif;
-  font-size: 10px;
-  letter-spacing: 0.32em;
+  font-size: 10px; letter-spacing: 0.32em;
   text-transform: uppercase;
   color: rgba(200, 169, 122, 0.5);
   margin-bottom: 0.6rem;
 }
-
 .info-modal__titulo {
   font-family: Georgia, serif;
-  font-style: italic;
-  font-weight: 400;
+  font-style: italic; font-weight: 400;
   font-size: clamp(1.1rem, 2.5vw, 1.5rem);
   color: rgba(230, 210, 170, 0.95);
   margin-bottom: 1rem;
 }
-
 .info-modal__texto {
   font-family: Georgia, serif;
   font-size: clamp(0.82rem, 1.8vw, 0.95rem);
@@ -412,11 +424,7 @@ body.is-fullscreen .ui-btn--fs .ico-fs-off { display: block; }
   color: rgba(200, 185, 150, 0.8);
   margin-bottom: 1rem;
 }
-
-.info-modal__pasos {
-  list-style: none;
-  padding: 0;
-}
+.info-modal__pasos { list-style: none; padding: 0; }
 .info-modal__pasos li {
   font-family: Georgia, serif;
   font-size: clamp(0.78rem, 1.6vw, 0.88rem);
@@ -428,22 +436,18 @@ body.is-fullscreen .ui-btn--fs .ico-fs-off { display: block; }
 }
 .info-modal__pasos li::before {
   content: '–';
-  position: absolute;
-  left: 0;
+  position: absolute; left: 0;
   color: rgba(200, 169, 122, 0.45);
 }
 
-/* ── Ghost de arrastre ────────────────────────────────── */
+/* ── Drag ghost ─────────────────────────────────────── */
 #drag-ghost {
   display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
+  position: fixed; top: 0; left: 0;
   pointer-events: none;
   z-index: 9999;
   transform: translate(-50%, -50%);
 }
-
 #drag-ghost img {
   display: block;
   width: clamp(60px, 8vw, 100px);
@@ -452,59 +456,68 @@ body.is-fullscreen .ui-btn--fs .ico-fs-off { display: block; }
   filter: brightness(1.4) drop-shadow(0 4px 20px rgba(220, 160, 60, 0.7));
   opacity: 0.88;
 }
-
-body.is-dragging,
-body.is-dragging * { cursor: grabbing !important; }
+body.is-dragging, body.is-dragging * { cursor: grabbing !important; }
 
 /* ═══════════════════════════════════════════════════════
-   PORTRAIT — máscaras más grandes, sello ajustado
+   PORTRAIT — ajustes para formato vertical
    ═══════════════════════════════════════════════════════ */
 @media (orientation: portrait) {
-  /* La bandeja crece un poco más para dar mejor target */
+  /* Posiciones de rupestres en vertical: el fondo se recorta
+     en los laterales (object-fit: cover), así que compactamos. */
+  .char-layer[data-rupestre="a1"], .drop-hotspot[data-rupestre="a1"] { --tx: 42%; --ty: 12%; }
+  .char-layer[data-rupestre="a2"], .drop-hotspot[data-rupestre="a2"] { --tx: 53%; --ty: 17%; }
+  .char-layer[data-rupestre="a3"], .drop-hotspot[data-rupestre="a3"] { --tx: 60%; --ty: 14%; }
+
+  .char-layer[data-rupestre="p1"], .drop-hotspot[data-rupestre="p1"] { --tx: 31%; --ty: 32%; }
+  .char-layer[data-rupestre="p2"], .drop-hotspot[data-rupestre="p2"] { --tx: 24%; --ty: 44%; }
+  .char-layer[data-rupestre="p3"], .drop-hotspot[data-rupestre="p3"] { --tx: 30%; --ty: 54%; }
+
+  .char-layer[data-rupestre="m1"], .drop-hotspot[data-rupestre="m1"] { --tx: 68%; --ty: 40%; }
+  .char-layer[data-rupestre="m2"], .drop-hotspot[data-rupestre="m2"] { --tx: 62%; --ty: 54%; }
+  .char-layer[data-rupestre="m3"], .drop-hotspot[data-rupestre="m3"] { --tx: 74%; --ty: 58%; }
+
+  .drop-hotspot { width: 13%; height: 10%; }
+
   #mask-tray {
-    height: 28vh;
+    height: 26vh;
     gap: clamp(10px, 6vw, 42px);
-    background: linear-gradient(
-      to bottom,
+    background: linear-gradient(to bottom,
       rgba(12, 9, 5, 0) 0%,
       rgba(12, 9, 5, 0.55) 60%,
-      rgba(12, 9, 5, 0.82) 100%
-    );
+      rgba(12, 9, 5, 0.82) 100%);
   }
 
-  /* Masks escalan con vw (pantalla más estrecha) */
-  #slot-viento { width: clamp(80px, 23vw, 160px); }
-  #slot-tierra { width: clamp(65px, 19vw, 130px); }
-  #slot-agua   { width: clamp(55px, 16vw, 110px); }
+  #mask-tray .mask-slot[data-mask="viento"] { width: clamp(80px, 23vw, 160px); }
+  #mask-tray .mask-slot[data-mask="percu"]  { width: clamp(65px, 19vw, 130px); }
+  #mask-tray .mask-slot[data-mask="sinte"]  { width: clamp(65px, 18vw, 125px); }
+
+  #loop-deck {
+    bottom: calc(26vh + 10px);
+    padding: 6px 10px;
+    gap: clamp(6px, 1.8vw, 12px);
+  }
+  .loop-circle { width: 18px; height: 18px; }
+  .pause-btn { width: 34px; height: 34px; }
 
   .preludio__titulo      { font-size: clamp(22px, 6vw, 36px); }
   .preludio__nivel       { font-size: clamp(8px, 2.4vw, 11px); }
   .preludio__instruccion { font-size: clamp(12px, 3.5vw, 17px); }
   #hint-text             { font-size: clamp(7px, 2.2vw, 11px); }
 
-  /* Sello se achica para no colisionar con el área de juego */
-  .sello {
-    bottom: calc(28vh + 8px);
-    font-size: clamp(7px, 1.8vw, 10px);
-  }
+  .sello { bottom: calc(26vh + 8px); font-size: clamp(7px, 1.8vw, 10px); }
   .sello__obra { font-size: clamp(9px, 2.4vw, 13px); }
 
-  /* info + fs buttons suben sobre la bandeja */
-  .ui-btn--info {
-    bottom: calc(28vh + 56px + max(8px, env(safe-area-inset-bottom)));
-  }
-  .ui-btn--fs {
-    bottom: calc(28vh + max(8px, env(safe-area-inset-bottom)));
-  }
+  .ui-btn--info { bottom: calc(26vh + 56px + max(8px, env(safe-area-inset-bottom))); }
+  .ui-btn--fs   { bottom: calc(26vh + max(8px, env(safe-area-inset-bottom))); }
 }
 
-/* Landscape mobile bajo: achicar ligeramente */
 @media (orientation: landscape) and (max-height: 480px) {
-  #hint-text   { font-size: 7px; }
-  #mask-tray   { height: 28%; gap: clamp(8px, 3vw, 30px); }
-  .ui-btn      { width: 36px; height: 36px; }
-  .ui-btn svg  { width: 16px; height: 16px; }
-  .ui-btn--info {
-    bottom: calc(max(10px, env(safe-area-inset-bottom)) + 48px);
-  }
+  #hint-text  { font-size: 7px; }
+  #mask-tray  { height: 28%; gap: clamp(8px, 3vw, 30px); }
+  .ui-btn     { width: 36px; height: 36px; }
+  .ui-btn svg { width: 16px; height: 16px; }
+  .ui-btn--info { bottom: calc(max(10px, env(safe-area-inset-bottom)) + 48px); }
+  #loop-deck { bottom: calc(28% + 8px); padding: 5px 9px; }
+  .loop-circle { width: 16px; height: 16px; }
+  .pause-btn { width: 30px; height: 30px; }
 }
