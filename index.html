@@ -257,27 +257,20 @@
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 8px;
-    }
-
-    .logos-fila {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .logo-img {
       display: block;
-      height: 28px;
+      height: 22px;       /* tamaño homogéneo — ancho se ajusta automáticamente */
       width: auto;
-      max-width: 180px;
+      max-width: 120px;   /* evita wordmarks demasiado anchos */
       object-fit: contain;
-      opacity: 0.7;
+      opacity: 0.65;
       transition: opacity 0.25s ease;
       filter: brightness(1.1);
     }
     .logo-img:hover { opacity: 1; }
-    /* Logos con fondo oscuro removido → se ven sobre bg oscuro sin blend mode */
 
     /* ── Animación ──────────────────────────────────────── */
     @keyframes surgir {
@@ -354,20 +347,10 @@
   </div>
 
   <footer class="logos-footer" aria-label="Aliados">
-    <!-- Fila superior: íconos cuadrados -->
-    <div class="logos-fila">
-      <img class="logo-img" src="logos/logo-asset12.webp" alt=""
-           onerror="this.style.display='none'">
-      <img class="logo-img" src="logos/logo-tactil.webp"  alt="Táctil Lab"
-           onerror="this.style.display='none'">
-    </div>
-    <!-- Fila inferior: logotipos horizontales -->
-    <div class="logos-fila">
-      <img class="logo-img" src="logos/logo-cocrea.webp" alt="CoCrea"
-           onerror="this.style.display='none'">
-      <img class="logo-img" src="logos/logo-sigit.webp"  alt="SIGIT Uniandes"
-           onerror="this.style.display='none'">
-    </div>
+    <img class="logo-img" src="logos/logo-asset12.webp" alt=""               onerror="this.style.display='none'">
+    <img class="logo-img" src="logos/logo-tactil.webp"  alt="Táctil Lab"     onerror="this.style.display='none'">
+    <img class="logo-img" src="logos/logo-cocrea.webp"  alt="CoCrea"         onerror="this.style.display='none'">
+    <img class="logo-img" src="logos/logo-sigit.webp"   alt="SIGIT Uniandes" onerror="this.style.display='none'">
   </footer>
 
   <script>
