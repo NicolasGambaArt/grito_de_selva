@@ -65,12 +65,13 @@ function currentLoopOffset() { return (masterNowMs() / 1000) % LOOP_LENGTH; }
    ═══════════════════════════════════════════════════════════════════════ */
 function audioEl(key) { return document.getElementById('aud-' + key); }
 
-function audioStart(key) {
+function audioStart(key, offset) {
   const el = audioEl(key);
   if (!el) return;
-  /* Sincroniza al reloj maestro: offset = posición actual del ciclo.
-     Como entramos en una puerta (0 o 4.8 s), el audio arranca en 0 o 4.8. */
-  el.currentTime = currentLoopOffset();
+  /* Sincroniza al reloj maestro: si se pasa offset (p. ej. 0 o 4.8 al cruzar
+     una puerta) se usa ese valor exacto para evitar drift entre pistas. */
+  const target = (typeof offset === 'number') ? offset : currentLoopOffset();
+  try { el.currentTime = target; } catch (_) {}
   el.volume = 0;
   const p = el.play();
   if (p) p.catch(e => console.warn('[audio] play bloqueado:', key, e.message));
@@ -81,6 +82,22 @@ function audioStart(key) {
     if (t < 1) requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
+}
+
+/* Re-ancla un audio ya en reproducción al offset ideal de la puerta.
+   Se llama en cada cruce (0 s y 4.8 s) para cancelar el drift acumulado
+   por el encoder OGG y por las diferencias entre el loop nativo del
+   <audio> y el reloj maestro. */
+function audioResync(key, offset) {
+  const el = audioEl(key);
+  if (!el || el.paused) return;
+  try {
+    /* Solo corregimos si la desviación es audible (> 20 ms) — así evitamos
+       micro-saltos innecesarios cuando ya está bien alineado. */
+    if (Math.abs(el.currentTime - offset) > 0.020) {
+      el.currentTime = offset;
+    }
+  } catch (_) {}
 }
 
 function audioStop(key) {
@@ -241,16 +258,33 @@ function tick() {
   const crossedHalf       = audioRunning && lastOffset < GATES[1] && offset >= GATES[1]; // 4.8 s
 
   if (crossedCycleStart || crossedHalf) {
-    /* Activa todas las siluetas pendientes */
+    /* Offset ideal de la puerta: 0 s al inicio del ciclo, 4.8 s en la mitad.
+       Usamos este valor exacto —no el `offset` actual, que ya puede ir unos
+       ms por delante— para alinear todos los audios al mismo instante. */
+    const gateOffset = crossedCycleStart ? 0 : GATES[1];
+
+    /* 1) Re-sincroniza los audios ya activos: corrige el drift que
+          acumularon desde la puerta anterior. */
+    Object.keys(rupestreState).forEach(rupId => {
+      if (rupestreState[rupId] === 'active') {
+        const mask = rupestreMask[rupId];
+        const zone = RUPESTRES[rupId].zone;
+        audioResync(`${zone}-${mask}`, gateOffset);
+      }
+    });
+
+    /* 2) Activa todas las siluetas pendientes, todas al MISMO offset
+          para que nazcan perfectamente alineadas entre sí. */
     Object.keys(rupestreState).forEach(rupId => {
       if (rupestreState[rupId] === 'waiting') {
         const mask = rupestreMask[rupId];
         const zone = RUPESTRES[rupId].zone;
         rupestreState[rupId] = 'active';
-        audioStart(`${zone}-${mask}`);
+        audioStart(`${zone}-${mask}`, gateOffset);
         renderRupestre(rupId);
       }
     });
+
     /* Flash visual del anillo en la puerta */
     flashGate();
     updateDeckUI();

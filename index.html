@@ -249,6 +249,19 @@
     .nivel-card:focus-visible .nivel-titulo { opacity: 1; }
 
     /* ── Logos ──────────────────────────────────────────── */
+    .credito-autor {
+      position: fixed;
+      bottom: max(14px, env(safe-area-inset-bottom));
+      left:   max(16px, env(safe-area-inset-left));
+      z-index: 10;
+      margin: 0;
+      font-family: Georgia, serif;
+      font-size: clamp(9px, 1vw, 11px);
+      color: rgba(210, 185, 145, 0.55);
+      letter-spacing: 0.04em;
+      pointer-events: none;
+    }
+
     .logos-footer {
       position: fixed;
       bottom: max(14px, env(safe-area-inset-bottom));
@@ -310,6 +323,8 @@
         Trópico), como respuesta al daño cognitivo que las nuevas tecnologías están generando en las
         infancias rurales y citadinas. La máscara, el tambor y el pigmento aparecen aquí como
         mediaciones sensoriales que reparan lo que las pantallas han empezado a erosionar.
+        A la vez, el proyecto tiene un enfoque pedagógico que busca aproximar a las infancias
+        al reconocimiento de la diversidad cultural del territorio.
       </p>
     </section>
 
@@ -344,6 +359,8 @@
     </nav>
 
   </div>
+
+  <p class="credito-autor">creado por Nicolás Gamba</p>
 
   <footer class="logos-footer" aria-label="Aliados">
     <img class="logo-img" src="logos/logo-ebra.webp"   alt=""               onerror="this.style.display='none'">

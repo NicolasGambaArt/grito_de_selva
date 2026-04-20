@@ -334,6 +334,17 @@ body { display: flex; justify-content: center; align-items: center; }
 }
 .mask-slot.in-use .badge { display: inline-flex; }
 
+/* Máscara activa: silueta oscura en la bandeja */
+.mask-slot.in-use img {
+  filter: brightness(0.15) contrast(1.4) drop-shadow(0 0 5px rgba(220,180,120,0.35));
+  opacity: 0.6;
+  animation: mask-silhouette-pulse 1.8s ease-in-out infinite;
+}
+@keyframes mask-silhouette-pulse {
+  0%, 100% { opacity: 0.45; }
+  50%       { opacity: 0.7;  }
+}
+
 /* ── Controles UI ─────────────────────────────────────── */
 .ui-btn {
   position: fixed;
