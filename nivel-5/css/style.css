@@ -131,30 +131,31 @@ body {
 
 .preludio__nivel {
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(9px, 1.1vw, 13px);
-  letter-spacing: 0.32em;
+  font-size: clamp(9px, 1.1vw, 12px);
+  letter-spacing: 0.42em;
   text-transform: uppercase;
-  color: rgba(200, 169, 122, 0.55);
-  margin-bottom: 10px;
+  color: rgba(200, 169, 122, 0.65);
+  margin-bottom: 12px;
 }
 
 .preludio__titulo {
   font-family: Georgia, 'Times New Roman', serif;
   font-style: italic;
-  font-size: clamp(22px, 3vw, 40px);
-  color: rgba(220, 196, 152, 0.88);
+  font-size: clamp(30px, 3.8vw, 52px);
+  color: rgba(230, 212, 170, 0.96);
   letter-spacing: 0.02em;
-  text-shadow: 0 2px 16px rgba(0,0,0,0.8);
-  line-height: 1.2;
+  text-shadow: 0 2px 18px rgba(0,0,0,0.85);
+  line-height: 1.15;
+  margin-bottom: 16px;
 }
 
 .preludio__instruccion {
-  margin-top: 8px;
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(9px, 1vw, 12px);
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: rgba(200, 169, 122, 0.45);
+  font-style: italic;
+  font-size: clamp(14px, 1.7vw, 20px);
+  letter-spacing: 0.04em;
+  color: rgba(200, 182, 140, 0.78);
+  line-height: 1.65;
 }
 
 /* ── Hint text (permanente, sutil) ───────────────────── */
@@ -476,9 +477,10 @@ body.is-dragging * { cursor: grabbing !important; }
   #slot-tierra { width: clamp(65px, 19vw, 130px); }
   #slot-agua   { width: clamp(55px, 16vw, 110px); }
 
-  .preludio__titulo { font-size: clamp(18px, 5.5vw, 32px); }
-  .preludio__nivel  { font-size: clamp(8px,  2.2vw, 12px); }
-  #hint-text        { font-size: clamp(7px,  2.2vw, 11px); }
+  .preludio__titulo      { font-size: clamp(22px, 6vw, 36px); }
+  .preludio__nivel       { font-size: clamp(8px, 2.4vw, 11px); }
+  .preludio__instruccion { font-size: clamp(12px, 3.5vw, 17px); }
+  #hint-text             { font-size: clamp(7px, 2.2vw, 11px); }
 
   /* Sello se achica para no colisionar con el área de juego */
   .sello {

@@ -205,29 +205,32 @@ body {
 
 .preludio__nivel {
   font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.32em;
+  font-size: clamp(9px, 1.1vw, 12px);
+  letter-spacing: 0.42em;
   text-transform: uppercase;
   color: var(--crema-tenue);
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .preludio__titulo {
   font-family: var(--serif);
   font-weight: 400;
   font-style: italic;
-  font-size: clamp(28px, 3.2vw, 44px);
+  font-size: clamp(30px, 3.8vw, 52px);
   letter-spacing: 0.02em;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.7);
+  color: var(--crema);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.8);
+  line-height: 1.15;
+  margin-bottom: 16px;
 }
 
 .preludio__instruccion {
-  margin-top: 10px;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
+  font-family: var(--serif);
+  font-size: clamp(14px, 1.7vw, 20px);
+  font-style: italic;
+  letter-spacing: 0.04em;
   color: var(--crema-tenue);
+  line-height: 1.65;
 }
 
 /* ============================================================
