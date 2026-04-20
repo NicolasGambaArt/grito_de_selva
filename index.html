@@ -257,6 +257,7 @@
       margin: 0;
       font-family: Georgia, serif;
       font-size: clamp(9px, 1vw, 11px);
+      line-height: 1.4;
       color: rgba(210, 185, 145, 0.55);
       letter-spacing: 0.04em;
       pointer-events: none;
@@ -291,6 +292,9 @@
 
     @media (max-width: 600px) {
       .concepto { padding: 0 0.5rem; }
+      .logo-img { height: clamp(22px, 6vw, 30px); }
+      .logos-footer { gap: 10px; }
+      .credito-autor { font-size: 9px; }
     }
   </style>
 </head>
@@ -360,7 +364,7 @@
 
   </div>
 
-  <p class="credito-autor">creado por Nicolás Gamba</p>
+  <p class="credito-autor">creado por<br>Nicolás Gamba</p>
 
   <footer class="logos-footer" aria-label="Aliados">
     <img class="logo-img" src="logos/logo-ebra.webp"   alt=""               onerror="this.style.display='none'">
