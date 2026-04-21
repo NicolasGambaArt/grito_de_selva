@@ -9,8 +9,8 @@
    Una máscara = un rupestre a la vez.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const LOOP_LENGTH = 9.6;                 // duración del ciclo maestro
-const GATES       = [0, LOOP_LENGTH / 2];// puertas: 0 s y 4.8 s dentro de cada ciclo
+let   LOOP_LENGTH = 9.6;                 // duración del ciclo maestro (se ajusta a la duración real del buffer)
+let   GATES       = [0, LOOP_LENGTH / 2];// puertas: 0 s y 4.8 s dentro de cada ciclo
 const FADE_MS     = 60;
 
 const LAYERS = {
@@ -62,16 +62,88 @@ function masterNowMs() {
 function currentLoopOffset() { return (masterNowMs() / 1000) % LOOP_LENGTH; }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   AUDIO
+   AUDIO — Web Audio API con AudioBufferSourceNode para loops sin gap
+   (estilo Incredibox). Fallback: <audio> element si fetch falla
+   (p. ej. abriendo el .html directamente con file://). En ese caso el
+   loop tendrá el pequeño silencio de padding inherente al codec OGG
+   Vorbis — la solución es servir el prototipo desde un servidor local
+   (python -m http.server, Live Server, GitHub Pages, etc.).
    ═══════════════════════════════════════════════════════════════════════ */
+let audioCtx      = null;
+let useWebAudio   = false;
+const buffers     = {};   // key → AudioBuffer (PCM sin padding)
+const sources     = {};   // key → { source, gain }
+
 function audioEl(key) { return document.getElementById('aud-' + key); }
 
+async function initAudio() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) throw new Error('AudioContext no soportado');
+    audioCtx = new Ctx();
+
+    const keys = Object.keys(LAYERS);
+    await Promise.all(keys.map(async key => {
+      const res = await fetch(`assets/loop-${key}.ogg`);
+      if (!res.ok) throw new Error(`HTTP ${res.status} en loop-${key}.ogg`);
+      const arrBuf = await res.arrayBuffer();
+      buffers[key] = await new Promise((resolve, reject) => {
+        /* decodeAudioData: descarta el padding del encoder Vorbis y
+           entrega PCM exacto. source.loop=true loopea sin silencio. */
+        audioCtx.decodeAudioData(arrBuf, resolve, reject);
+      });
+    }));
+
+    useWebAudio = true;
+
+    /* Alinea LOOP_LENGTH a la duración real del buffer para que el reloj
+       maestro (visual) y la rueda PCM del buffer no drifteen nunca. */
+    const firstKey = Object.keys(buffers)[0];
+    if (firstKey) {
+      const dur = buffers[firstKey].duration;
+      if (Math.abs(dur - LOOP_LENGTH) > 0.01) {
+        LOOP_LENGTH = dur;
+        GATES[1]    = LOOP_LENGTH / 2;
+        console.log(`[audio] LOOP_LENGTH ajustado a ${dur.toFixed(4)}s`);
+      }
+    }
+    console.log('[audio] Web Audio activo — loops sin gap');
+  } catch (err) {
+    useWebAudio = false;
+    console.warn('[audio] Web Audio no disponible:', err.message);
+    console.warn('[audio] Usando <audio> element (con gap de Vorbis). Para loops sin gap, sirve desde un servidor: python -m http.server');
+  }
+}
+
 function audioStart(key, offset) {
+  const target = (typeof offset === 'number') ? offset : currentLoopOffset();
+
+  if (useWebAudio && buffers[key]) {
+    /* Detiene cualquier source previa de esta misma clave */
+    stopWebAudioSource(key, true);
+
+    const source = audioCtx.createBufferSource();
+    source.buffer = buffers[key];
+    source.loop   = true;            // loop PCM-exacto, sin gap
+    source.loopStart = 0;
+    source.loopEnd   = buffers[key].duration;
+
+    const gain = audioCtx.createGain();
+    gain.gain.value = 0;
+
+    source.connect(gain).connect(audioCtx.destination);
+    source.start(0, target);
+
+    const now = audioCtx.currentTime;
+    gain.gain.linearRampToValueAtTime(1, now + FADE_MS / 1000);
+
+    sources[key] = { source, gain };
+    return;
+  }
+
+  /* Fallback: <audio> element */
   const el = audioEl(key);
   if (!el) return;
-  /* Sincroniza al reloj maestro: si se pasa offset (p. ej. 0 o 4.8 al cruzar
-     una puerta) se usa ese valor exacto para evitar drift entre pistas. */
-  const target = (typeof offset === 'number') ? offset : currentLoopOffset();
   try { el.currentTime = target; } catch (_) {}
   el.volume = 0;
   const p = el.play();
@@ -85,16 +157,30 @@ function audioStart(key, offset) {
   requestAnimationFrame(step);
 }
 
-/* Re-ancla un audio ya en reproducción al offset ideal de la puerta.
-   Se llama en cada cruce (0 s y 4.8 s) para cancelar el drift acumulado
-   por el encoder OGG y por las diferencias entre el loop nativo del
-   <audio> y el reloj maestro. */
+function stopWebAudioSource(key, immediate) {
+  const s = sources[key];
+  if (!s) return;
+  const now = audioCtx.currentTime;
+  if (immediate) {
+    try { s.source.stop(0); } catch (_) {}
+    try { s.source.disconnect(); } catch (_) {}
+    try { s.gain.disconnect();   } catch (_) {}
+  } else {
+    s.gain.gain.cancelScheduledValues(now);
+    s.gain.gain.setValueAtTime(s.gain.gain.value, now);
+    s.gain.gain.linearRampToValueAtTime(0, now + FADE_MS / 1000);
+    try { s.source.stop(now + FADE_MS / 1000 + 0.05); } catch (_) {}
+  }
+  delete sources[key];
+}
+
+/* Con Web Audio + loop=true no hay drift jamás — esta función queda como
+   no-op en ese modo. Solo resyncamos el <audio> fallback. */
 function audioResync(key, offset) {
+  if (useWebAudio) return;
   const el = audioEl(key);
   if (!el || el.paused) return;
   try {
-    /* Solo corregimos si la desviación es audible (> 20 ms) — así evitamos
-       micro-saltos innecesarios cuando ya está bien alineado. */
     if (Math.abs(el.currentTime - offset) > 0.020) {
       el.currentTime = offset;
     }
@@ -102,6 +188,10 @@ function audioResync(key, offset) {
 }
 
 function audioStop(key) {
+  if (useWebAudio) {
+    stopWebAudioSource(key, false);
+    return;
+  }
   const el = audioEl(key);
   if (!el) return;
   const startVol = el.volume;
@@ -121,6 +211,10 @@ function audioStop(key) {
 }
 
 function pauseAllAudios() {
+  if (useWebAudio) {
+    if (audioCtx && audioCtx.state === 'running') audioCtx.suspend();
+    return;
+  }
   Object.keys(LAYERS).forEach(k => {
     const el = audioEl(k);
     if (el && !el.paused) el.pause();
@@ -128,6 +222,10 @@ function pauseAllAudios() {
 }
 
 function resumeActiveAudios() {
+  if (useWebAudio) {
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    return;
+  }
   Object.entries(maskChar).forEach(([mask, rup]) => {
     if (!rup) return;
     if (rupestreState[rup] !== 'active') return;
@@ -233,6 +331,9 @@ function applyMask(mask, rupId) {
         arranca el tempo YA y activa este rupestre en el offset 0
         — sin esperar al próximo gate — para respuesta inmediata. */
   if (!audioRunning) {
+    /* Web Audio requiere gesto de usuario para arrancar el contexto */
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+
     pausedAccumMs += (performance.now() - pausedAtMs);
     pausedAtMs = null;
     audioRunning = true;
@@ -477,6 +578,10 @@ function syncFsClass() { document.body.classList.toggle('is-fullscreen', isFulls
    ═══════════════════════════════════════════════════════════════════════ */
 function init() {
   Object.values(LAYERS).forEach(l => { const img = new Image(); img.src = l.anim; });
+
+  /* Carga buffers Web Audio en paralelo (no bloqueante).
+     Si falla (file://), caemos al <audio> precargado en el HTML. */
+  initAudio();
 
   renderAllRupestres();
 
