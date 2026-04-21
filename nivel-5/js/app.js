@@ -47,11 +47,12 @@ const maskChar     = { viento: null, percu: null, sinte: null };        // mask 
 const rupestreMask = Object.fromEntries(Object.keys(RUPESTRES).map(k => [k, null]));
 const rupestreState = Object.fromEntries(Object.keys(RUPESTRES).map(k => [k, 'idle'])); // 'idle' | 'waiting' | 'active'
 
-/* Reloj maestro con soporte de pausa */
+/* Reloj maestro con soporte de pausa.
+   Arranca EN PAUSA: el ciclo se activa cuando se coloca la primera máscara. */
 const masterStartReal = performance.now();
 let   pausedAccumMs   = 0;
-let   pausedAtMs      = null;  // null si está corriendo
-let   audioRunning    = true;
+let   pausedAtMs      = masterStartReal;  // pausado desde el inicio
+let   audioRunning    = false;
 
 function masterNowMs() {
   const now = performance.now();
@@ -227,6 +228,23 @@ function applyMask(mask, rupId) {
   renderRupestre(rupId);
   updateMaskSlots();
   updateDeckUI();
+
+  /* 4. Si el reloj está en pausa inicial (primera máscara del nivel),
+        arranca el tempo YA y activa este rupestre en el offset 0
+        — sin esperar al próximo gate — para respuesta inmediata. */
+  if (!audioRunning) {
+    pausedAccumMs += (performance.now() - pausedAtMs);
+    pausedAtMs = null;
+    audioRunning = true;
+    lastOffset = 0;
+
+    const zone = RUPESTRES[rupId].zone;
+    rupestreState[rupId] = 'active';
+    audioStart(`${zone}-${mask}`, 0);
+    renderRupestre(rupId);
+    flashGate();
+    updateDeckUI();
+  }
 }
 
 function removeMask(rupId) {
@@ -263,15 +281,20 @@ function tick() {
        ms por delante— para alinear todos los audios al mismo instante. */
     const gateOffset = crossedCycleStart ? 0 : GATES[1];
 
-    /* 1) Re-sincroniza los audios ya activos: corrige el drift que
-          acumularon desde la puerta anterior. */
-    Object.keys(rupestreState).forEach(rupId => {
-      if (rupestreState[rupId] === 'active') {
-        const mask = rupestreMask[rupId];
-        const zone = RUPESTRES[rupId].zone;
-        audioResync(`${zone}-${mask}`, gateOffset);
-      }
-    });
+    /* 1) Re-sincroniza los audios ya activos solo en el gate de la MITAD
+          (4.8 s). En el gate de INICIO el <audio loop> ya wrapeó por sí
+          solo, y forzar currentTime=0 ahí genera un click audible que
+          rompe la sensación de loop fluido. El drift residual se corrige
+          al llegar al siguiente medio ciclo. */
+    if (crossedHalf) {
+      Object.keys(rupestreState).forEach(rupId => {
+        if (rupestreState[rupId] === 'active') {
+          const mask = rupestreMask[rupId];
+          const zone = RUPESTRES[rupId].zone;
+          audioResync(`${zone}-${mask}`, gateOffset);
+        }
+      });
+    }
 
     /* 2) Activa todas las siluetas pendientes, todas al MISMO offset
           para que nazcan perfectamente alineadas entre sí. */
