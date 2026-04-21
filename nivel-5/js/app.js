@@ -377,34 +377,19 @@ function tick() {
   const crossedHalf       = audioRunning && lastOffset < GATES[1] && offset >= GATES[1]; // 4.8 s
 
   if (crossedCycleStart || crossedHalf) {
-    /* Offset ideal de la puerta: 0 s al inicio del ciclo, 4.8 s en la mitad.
-       Usamos este valor exacto —no el `offset` actual, que ya puede ir unos
-       ms por delante— para alinear todos los audios al mismo instante. */
-    const gateOffset = crossedCycleStart ? 0 : GATES[1];
-
-    /* 1) Re-sincroniza los audios ya activos solo en el gate de la MITAD
-          (4.8 s). En el gate de INICIO el <audio loop> ya wrapeó por sí
-          solo, y forzar currentTime=0 ahí genera un click audible que
-          rompe la sensación de loop fluido. El drift residual se corrige
-          al llegar al siguiente medio ciclo. */
-    if (crossedHalf) {
-      Object.keys(rupestreState).forEach(rupId => {
-        if (rupestreState[rupId] === 'active') {
-          const mask = rupestreMask[rupId];
-          const zone = RUPESTRES[rupId].zone;
-          audioResync(`${zone}-${mask}`, gateOffset);
-        }
-      });
-    }
-
-    /* 2) Activa todas las siluetas pendientes, todas al MISMO offset
-          para que nazcan perfectamente alineadas entre sí. */
+    /* Toda entrada —en la puerta 0 s o en la 4.8 s— arranca el clip
+       desde el comienzo (offset 0). Así hay dos puntos posibles de
+       entrada musical, ambos desde el inicio del sample, lo que
+       además enmascara cualquier micro-gap de wrap porque el oído
+       recibe material fresco en cada puerta.
+       Las pistas ya activas mantienen su propio ciclo independiente
+       (loop=true) — no se resyncan. */
     Object.keys(rupestreState).forEach(rupId => {
       if (rupestreState[rupId] === 'waiting') {
         const mask = rupestreMask[rupId];
         const zone = RUPESTRES[rupId].zone;
         rupestreState[rupId] = 'active';
-        audioStart(`${zone}-${mask}`, gateOffset);
+        audioStart(`${zone}-${mask}`, 0);
         renderRupestre(rupId);
       }
     });
