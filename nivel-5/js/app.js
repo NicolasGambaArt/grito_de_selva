@@ -84,8 +84,8 @@ async function initAudio() {
 
     const keys = Object.keys(LAYERS);
     await Promise.all(keys.map(async key => {
-      const res = await fetch(`assets/loop-${key}.ogg`);
-      if (!res.ok) throw new Error(`HTTP ${res.status} en loop-${key}.ogg`);
+      const res = await fetch(`assets/loop-${key}.wav`);
+      if (!res.ok) throw new Error(`HTTP ${res.status} en loop-${key}.wav`);
       const arrBuf = await res.arrayBuffer();
       buffers[key] = await new Promise((resolve, reject) => {
         /* decodeAudioData: descarta el padding del encoder Vorbis y
