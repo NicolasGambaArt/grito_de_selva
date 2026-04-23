@@ -264,8 +264,8 @@ body { display: flex; justify-content: center; align-items: center; }
 
 .pause-btn .ico-pause { display: none; }
 .pause-btn .ico-play  { display: block; margin-left: 2px; }
-#loop-deck.is-running .pause-btn .ico-pause { display: block; margin-left: 0; }
-#loop-deck.is-running .pause-btn .ico-play  { display: none; }
+#loop-deck.is-playing .pause-btn .ico-pause { display: block; margin-left: 0; }
+#loop-deck.is-playing .pause-btn .ico-play  { display: none; }
 
 /* Parpadeo del anillo en la entrada de puerta */
 #loop-deck.gate-flash .ring-prog {

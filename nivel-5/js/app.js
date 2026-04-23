@@ -424,9 +424,13 @@ function flashGate() {
 function updateDeckUI() {
   const deck = document.getElementById('loop-deck');
   const anyActive = Object.values(rupestreState).some(s => s === 'active' || s === 'waiting');
-  deck.classList.toggle('is-empty', !anyActive);
+  deck.classList.toggle('is-empty',   !anyActive);
   deck.classList.toggle('is-running', audioRunning && anyActive);
-  deck.classList.toggle('paused', !audioRunning);
+  deck.classList.toggle('paused',     !audioRunning);
+  /* is-playing controla el icono del botón: refleja SIEMPRE el estado
+     real de audioRunning, independiente de si hay máscaras activas.
+     Así el botón siempre coincide con lo que hace un click. */
+  deck.classList.toggle('is-playing', audioRunning);
 }
 
 function updateMaskSlots() {
